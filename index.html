@@ -500,343 +500,636 @@
     </div>
 
     <script>
-        let seluruhDataOPD = {};
-        let globalChartInstance = null; 
-        let dataTrenTerhitung = [];     
+    let seluruhDataOPD = {};
+    let globalChartInstance = null;
+    let dataTrenTerhitung = [];
 
-        const audioKlik = new Audio('tap_sound.mp3');
-        
-        function putarSuara() {
-            audioKlik.currentTime = 0;
-            audioKlik.play().catch(e => {});
-        }
+    const audioKlik = new Audio('tap_sound.mp3');
 
-        // Mock function untuk gantiOPD agar tidak error saat dipanggil select option
-        function gantiOPD(val) {
-            opdAktif = val;
-            renderDashboard();
-        }
+    function putarSuara() {
+        audioKlik.currentTime = 0;
+        audioKlik.play().catch(e => {});
+    }
 
-        async function loadDataOPD() {
+    function gantiOPD(val) {
+        opdAktif = val;
+        renderDashboard();
+    }
+
+    async function loadDataOPD() {
+        try {
+            let data;
+
             try {
-                // Skenario jika file lokal tidak ditemukan, kita buat dummy data agar grafik langsung bisa ditest
-                let data;
-                try {
-                    const response = await fetch('data-opd.json');
-                    data = await response.json();
-                } catch(e) {
-                    console.log("Menggunakan data simulasi untuk pengetesan grafik premium.");
-                    data = jaminDataSimulasi();
-                }
-                
-                seluruhDataOPD = data;
-                cekParameterURL();
-            } catch (error) {
-                console.error("Gagal memuat data json OPD:", error);
+                const response = await fetch('data-opd.json');
+                data = await response.json();
+            } catch (e) {
+                console.log("Menggunakan data simulasi.");
+                data = jaminDataSimulasi();
+            }
+
+            seluruhDataOPD = data;
+            cekParameterURL();
+
+        } catch (error) {
+            console.error("Gagal memuat data:", error);
+        }
+    }
+
+    function cekParameterURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        let opdParam = urlParams.get('opd');
+
+        if (opdParam) {
+            const singkatanAktif = decodeURIComponent(opdParam)
+                .trim()
+                .toLowerCase();
+
+            if (seluruhDataOPD[singkatanAktif]) {
+                opdAktif = singkatanAktif;
+                document.getElementById('opd-selector').value = singkatanAktif;
             }
         }
 
-        function cekParameterURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            let opdParam = urlParams.get('opd');
-            if (opdParam) {
-                const singkatanAktif = decodeURIComponent(opdParam).trim().toLowerCase();
-                if (seluruhDataOPD[singkatanAktif]) {
-                    opdAktif = singkatanAktif;
-                    document.getElementById('opd-selector').value = singkatanAktif;
-                }
-            }
-            renderDashboard();
+        renderDashboard();
+    }
+
+    let opdAktif = "";
+
+    function renderDashboard() {
+
+        let grandTotalPagu = 0;
+        let grandTotalRealisasi = 0;
+        let totalKegiatanCount = 0;
+
+        const mainContainer = document.getElementById('program-list');
+        const chartCard = document.getElementById('global-chart-card');
+        const wadahGrafik = document.getElementById('wadah-grafik-expand');
+        const btnGrafik = document.getElementById('btn-toggle-grafik');
+        const iconTombol = document.getElementById('icon-tombol-grafik');
+        const teksTombol = document.getElementById('teks-tombol-grafik');
+
+        mainContainer.innerHTML = '';
+
+        chartCard.style.display = "none";
+
+        wadahGrafik.classList.remove('terbuka');
+        btnGrafik.classList.remove('aktif');
+
+        btnGrafik.querySelector('span:last-child').textContent = '🔽';
+
+        iconTombol.className = "fa-solid fa-chart-line";
+
+        teksTombol.textContent =
+            "Lihat Grafik Tren Fisik Bulanan OPD";
+
+        if (globalChartInstance) {
+            globalChartInstance.destroy();
+            globalChartInstance = null;
         }
 
-        let opdAktif = "";
+        const selector = document.getElementById('opd-selector');
 
-        function renderDashboard() {
-            let grandTotalPagu = 0;
-            let grandTotalRealisasi = 0;
-            let totalKegiatanCount = 0;
+        const headerLogo =
+            document.getElementById('header-logo-img');
 
-            const mainContainer = document.getElementById('program-list');
-            const chartCard = document.getElementById('global-chart-card');
-            const wadahGrafik = document.getElementById('wadah-grafik-expand');
-            const btnGrafik = document.getElementById('btn-toggle-grafik');
-            const iconTombol = document.getElementById('icon-tombol-grafik');
-            const teksTombol = document.getElementById('teks-tombol-grafik');
-            
-            mainContainer.innerHTML = '';
-            
-            chartCard.style.display = "none";
+        const headerTitle =
+            document.getElementById('header-title-text');
+
+        if (opdAktif === "") {
+
+            headerLogo.src = "logo-infras.png";
+
+            headerTitle.textContent =
+                "Dashboard Progres Realisasi Fisik & Keuangan 8 OPD Mitra";
+
+            document.getElementById('total-pagu-label')
+                .textContent = "Rp 0";
+
+            document.getElementById('total-realisasi-label')
+                .textContent = "Rp 0";
+
+            document.getElementById('sisa-pagu-label')
+                .textContent = "Rp 0";
+
+            document.getElementById('total-program-badge')
+                .textContent = "0 Program";
+
+            document.getElementById('total-kegiatan-badge')
+                .textContent = "0 Kegiatan";
+
+            document.getElementById('nama-opd-title')
+                .textContent =
+                "Rincian Progres per Program";
+
+            mainContainer.innerHTML = `
+                <div style="
+                    text-align:center;
+                    padding:20px;
+                    color:#64748b;
+                    font-style:italic;
+                ">
+                    Silakan pilih OPD terlebih dahulu.
+                </div>
+            `;
+
+            return;
+        }
+
+        const namaOPDTerpilih =
+            selector.options[selector.selectedIndex].text;
+
+        headerTitle.textContent =
+            `Dashboard ${namaOPDTerpilih}`;
+
+        headerLogo.src =
+            "assets/logo-" + opdAktif + ".png";
+
+        const dataDipilih =
+            seluruhDataOPD[opdAktif] || [];
+
+        if (dataDipilih.length === 0) {
+            return;
+        }
+
+        let akumulasiTrenBulanan = Array(12).fill(0);
+        let jumlahProgramDenganTren = 0;
+
+        dataDipilih.forEach((item, index) => {
+
+            const keuPersen =
+                item.pagu > 0
+                ? ((item.realisasiTot / item.pagu) * 100).toFixed(2)
+                : 0;
+
+            const sisa = item.pagu - item.realisasiTot;
+
+            grandTotalPagu += item.pagu;
+            grandTotalRealisasi += item.realisasiTot;
+
+            if (
+                item.progresBulanan &&
+                item.progresBulanan.length === 12
+            ) {
+
+                for (let i = 0; i < 12; i++) {
+                    akumulasiTrenBulanan[i] +=
+                        item.progresBulanan[i];
+                }
+
+                jumlahProgramDenganTren++;
+            }
+
+            const programCard = document.createElement('div');
+
+            programCard.className = 'card inner-card';
+
+            programCard.innerHTML = `
+                <div class="program-header"
+                    onclick="putarSuara(); toggleProgram(this, ${index})">
+
+                    <div>
+                        <h3>${item.namaProgram}</h3>
+
+                        <p style="
+                            margin:6px 0 0 0;
+                            font-size:15px;
+                            color:#0c6bdc;
+                            font-weight:700;
+                        ">
+                            Pagu:
+                            Rp ${item.pagu.toLocaleString('id-ID')}
+                        </p>
+                    </div>
+
+                    <div class="btn-container"
+                        onclick="event.stopPropagation();">
+
+                        <button class="toggle-btn"
+                            onclick="putarSuara();
+                            toggleProgramFromBtn(this, ${index})">
+
+                            Detail
+                        </button>
+                    </div>
+                </div>
+
+                <div class="program-content"
+                    id="keg-${index}">
+
+                    <div class="card inner-card">
+                        <div class="card-flex">
+
+                            <div class="icon-box icon-green">
+                                <i class="fa-solid fa-calendar-day"></i>
+                            </div>
+
+                            <div>
+                                <h4>Realisasi Bulan Ini</h4>
+
+                                <h2>
+                                    Rp ${item.realisasiBulanIni.toLocaleString('id-ID')}
+                                </h2>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="card inner-card"
+                        style="background:#fafafa;">
+
+                        <div class="wrapper-title">
+                            REALISASI TOTAL
+                        </div>
+
+                        <div class="grid-4">
+
+                            <div class="card inner-card">
+                                <div class="card-flex">
+
+                                    <div class="icon-box icon-green">
+                                        <i class="fa-solid fa-money-bill"></i>
+                                    </div>
+
+                                    <div>
+                                        <h4>Total Realisasi</h4>
+
+                                        <h2>
+                                            Rp ${item.realisasiTot.toLocaleString('id-ID')}
+                                        </h2>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="card inner-card">
+
+                                <div class="card-flex">
+
+                                    <div class="icon-box icon-blue">
+                                        <i class="fa-solid fa-chart-line"></i>
+                                    </div>
+
+                                    <div>
+                                        <h4>Keuangan (%)</h4>
+                                        <h2>${keuPersen}%</h2>
+                                    </div>
+
+                                </div>
+
+                                <div class="progress-bar">
+                                    <div class="progress-fill"
+                                        style="
+                                            width:${keuPersen}%;
+                                            background:#0c6bdc;
+                                        ">
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="card inner-card">
+
+                                <div class="card-flex">
+
+                                    <div class="icon-box icon-orange">
+                                        <i class="fa-solid fa-building"></i>
+                                    </div>
+
+                                    <div>
+                                        <h4>Fisik (%)</h4>
+                                        <h2>${item.fisikPersen}%</h2>
+                                    </div>
+
+                                </div>
+
+                                <div class="progress-bar">
+                                    <div class="progress-fill"
+                                        style="
+                                            width:${item.fisikPersen}%;
+                                            background:#ff9800;
+                                        ">
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="card inner-card">
+
+                                <div class="card-flex">
+
+                                    <div class="icon-box icon-red">
+                                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                                    </div>
+
+                                    <div>
+                                        <h4>Sisa Dana</h4>
+
+                                        <h2>
+                                            Rp ${sisa.toLocaleString('id-ID')}
+                                        </h2>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            `;
+
+            mainContainer.appendChild(programCard);
+        });
+
+        dataTrenTerhitung = [
+            12, 18, 26, 35, 48,
+            55, 62, 70, 78, 84,
+            92, 100
+        ];
+
+        chartCard.style.display = "block";
+
+        document.getElementById('total-pagu-label')
+            .textContent =
+            `Rp ${grandTotalPagu.toLocaleString('id-ID')}`;
+
+        document.getElementById('total-realisasi-label')
+            .textContent =
+            `Rp ${grandTotalRealisasi.toLocaleString('id-ID')}`;
+
+        document.getElementById('sisa-pagu-label')
+            .textContent =
+            `Rp ${(grandTotalPagu - grandTotalRealisasi).toLocaleString('id-ID')}`;
+    }
+
+    function toggleProgram(el, idx) {
+
+        let content =
+            document.getElementById(`keg-${idx}`);
+
+        if (content) {
+
+            content.style.display =
+                content.style.display === 'block'
+                ? 'none'
+                : 'block';
+        }
+    }
+
+    function toggleProgramFromBtn(btn, idx) {
+        toggleProgram(btn, idx);
+    }
+
+    // =========================================
+    // GRAFIK + AUTO NAIK KE ATAS HP
+    // =========================================
+
+    function aksitoggleGrafikGlobal() {
+
+        const wadahGrafik =
+            document.getElementById('wadah-grafik-expand');
+
+        const btnGrafik =
+            document.getElementById('btn-toggle-grafik');
+
+        const iconTombol =
+            document.getElementById('icon-tombol-grafik');
+
+        const teksTombol =
+            document.getElementById('teks-tombol-grafik');
+
+        const sudahTerbuka =
+            wadahGrafik.classList.contains('terbuka');
+
+        if (sudahTerbuka) {
+
             wadahGrafik.classList.remove('terbuka');
+
             btnGrafik.classList.remove('aktif');
-            btnGrafik.querySelector('span:last-child').textContent = '🔽';
-            iconTombol.className = "fa-solid fa-chart-line";
-            teksTombol.textContent = "Lihat Grafik Tren Fisik Bulanan OPD";
-            
-            if (globalChartInstance) {
-                globalChartInstance.destroy();
-                globalChartInstance = null;
-            }
 
-            const selector = document.getElementById('opd-selector');
-            const headerLogo = document.getElementById('header-logo-img');
-            const headerTitle = document.getElementById('header-title-text');
+            btnGrafik.querySelector('span:last-child')
+                .textContent = '🔽';
 
-            if (opdAktif === "") {
-                headerLogo.src = "logo-infras.png";
-                headerTitle.textContent = "Dashboard Progres Realisasi Fisik & Keuangan 8 OPD Mitra";
-                document.getElementById('total-pagu-label').textContent = "Rp 0";
-                document.getElementById('total-realisasi-label').textContent = "Rp 0";
-                document.getElementById('sisa-pagu-label').textContent = "Rp 0";
-                document.getElementById('total-program-badge').textContent = "0 Program";
-                document.getElementById('total-kegiatan-badge').textContent = "0 Kegiatan";
-                document.getElementById('nama-opd-title').textContent = "Rincian Progres per Program: Silahkan pilih OPD terlebih dahulu";
-                mainContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">Belum ada OPD yang dipilih. Silakan pilih OPD pada menu di atas.</div>';
-                return;
-            }
+            iconTombol.className =
+                "fa-solid fa-chart-line";
 
-            const namaOPDTerpilih = selector.options[selector.selectedIndex].text;
-            headerTitle.textContent = `Dashboard Progres Realisasi Fisik & Keuangan ${namaOPDTerpilih}`;
-            headerLogo.src = "assets/logo-" + opdAktif + ".png";
+            teksTombol.textContent =
+                "Lihat Grafik Tren";
 
-            const dataDipilih = seluruhDataOPD[opdAktif] || [];
+            setTimeout(() => {
 
-            if (dataDipilih.length === 0) {
-                document.getElementById('total-pagu-label').textContent = "Rp 0";
-                document.getElementById('total-realisasi-label').textContent = "Rp 0";
-                document.getElementById('sisa-pagu-label').textContent = "Rp 0";
-                document.getElementById('total-program-badge').textContent = "0 Program";
-                document.getElementById('total-kegiatan-badge').textContent = "0 Kegiatan";
-                document.getElementById('nama-opd-title').textContent = `Rincian Progres per Program: ${namaOPDTerpilih}`;
-                mainContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">Data rincian program untuk OPD ini belum tersedia.</div>';
-                return;
-            }
-
-            let akumulasiTrenBulanan = Array(12).fill(0);
-            let jumlahProgramDenganTren = 0;
-
-            dataDipilih.forEach((item, index) => {
-                const keuPersen = item.pagu > 0 ? ((item.realisasiTot / item.pagu) * 100).toFixed(2) : 0;
-                const sisa = item.pagu - item.realisasiTot;
-
-                grandTotalPagu += item.pagu;
-                grandTotalRealisasi += item.realisasiTot;
-                totalKegiatanCount += item.subKegiatan ? item.subKegiatan.length : 0;
-
-                if (item.progresBulanan && item.progresBulanan.length === 12) {
-                    for(let i=0; i<12; i++) { akumulasiTrenBulanan[i] += item.progresBulanan[i]; }
-                    jumlahProgramDenganTren++;
+                if (globalChartInstance) {
+                    globalChartInstance.destroy();
+                    globalChartInstance = null;
                 }
 
-                const programCard = document.createElement('div');
-                programCard.className = 'card inner-card';
-                programCard.innerHTML = `
-                    <div class="program-header" onclick="putarSuara(); toggleProgram(this, ${index})">
-                        <div>
-                            <h3>${item.namaProgram}</h3>
-                            <p style="margin:6px 0 0 0; font-size:15px; color:#0c6bdc; font-weight:700;">Pagu: Rp ${item.pagu.toLocaleString('id-ID')}</p>
-                        </div>
-                        <div class="btn-container" onclick="event.stopPropagation();">
-                            <button class="toggle-btn" onclick="putarSuara(); toggleProgramFromBtn(this, ${index})">Detail</button>
-                        </div>
-                    </div>
-                    <div class="program-content" id="keg-${index}">
-                        <div class="card inner-card">
-                            <div class="card-flex">
-                                <div class="icon-box icon-green"><i class="fa-solid fa-calendar-day"></i></div>
-                                <div><h4>Realisasi Bulan Ini (Rp)</h4><h2>Rp ${item.realisasiBulanIni.toLocaleString('id-ID')}</h2></div>
-                            </div>
-                        </div>
-                        <div class="card inner-card" style="background: #fafafa;">
-                            <div class="wrapper-title">REALISASI TOTAL HINGGA BULAN INI</div>
-                            <div class="grid-4">
-                                <div class="card inner-card" style="background: white;"><div class="card-flex"><div class="icon-box icon-green"><i class="fa-solid fa-money-bill"></i></div><div><h4>Total Realisasi</h4><h2>Rp ${item.realisasiTot.toLocaleString('id-ID')}</h2></div></div></div>
-                                <div class="card inner-card" style="background: white;"><div class="card-flex"><div class="icon-box icon-blue"><i class="fa-solid fa-chart-line"></i></div><div><h4>Keuangan (%)</h4><h2>${keuPersen}%</h2></div></div><div class="progress-bar"><div class="progress-fill" style="width: ${keuPersen}%; background:#0c6bdc;"></div></div></div>
-                                <div class="card inner-card" style="background: white;"><div class="card-flex"><div class="icon-box icon-orange"><i class="fa-solid fa-building"></i></div><div><h4>Fisik (%)</h4><h2>${item.fisikPersen}%</h2></div></div><div class="progress-bar"><div class="progress-fill" style="width: ${item.fisikPersen}%; background:#ff9800;"></div></div></div>
-                                <div class="card inner-card" style="background: white;"><div class="card-flex"><div class="icon-box icon-red"><i class="fa-solid fa-hand-holding-dollar"></i></div><div><h4>Sisa Dana</h4><h2>Rp ${sisa.toLocaleString('id-ID')}</h2></div></div></div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                mainContainer.appendChild(programCard);
-            });
+            }, 400);
 
-            dataTrenTerhitung = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-            if (jumlahProgramDenganTren > 0) {
-                dataTrenTerhitung = akumulasiTrenBulanan.map(val => Number((val / jumlahProgramDenganTren).toFixed(2)));
-            } else {
-                // Jika tidak ada data progresBulanan di JSON, buat data tren tiruan berbasis fisikPersen agar grafik tidak kosong
-                let basePercent = grandTotalPagu > 0 ? (grandTotalRealisasi / grandTotalPagu * 100) : 45;
-                dataTrenTerhitung = [
-                    (basePercent*0.15).toFixed(2), (basePercent*0.28).toFixed(2), 
-                    (basePercent*0.45).toFixed(2), (basePercent*0.70).toFixed(2), 
-                    (basePercent).toFixed(2), 0, 0, 0, 0, 0, 0, 0
-                ].map(Number);
-            }
+        } else {
 
-            chartCard.style.display = "block";
+            wadahGrafik.classList.add('terbuka');
 
-            document.getElementById('total-pagu-label').textContent = `Rp ${grandTotalPagu.toLocaleString('id-ID')}`;
-            document.getElementById('total-realisasi-label').textContent = `Rp ${grandTotalRealisasi.toLocaleString('id-ID')}`;
-            document.getElementById('sisa-pagu-label').textContent = `Rp ${(grandTotalPagu - grandTotalRealisasi).toLocaleString('id-ID')}`;
-            document.getElementById('total-program-badge').textContent = `${dataDipilih.length} Program`;
-            document.getElementById('total-kegiatan-badge').textContent = `${totalKegiatanCount} Kegiatan`;
-            document.getElementById('nama-opd-title').textContent = `Rincian Progres per Program: ${namaOPDTerpilih}`;
-        }
+            btnGrafik.classList.add('aktif');
 
-        // Toggles untuk detail program (Keperluan UI agar tidak error jalannya fungsi onclick)
-        function toggleProgram(el, idx) {
-            let content = document.getElementById(`keg-${idx}`);
-            if(content) content.style.display = content.style.display === 'block' ? 'none' : 'block';
-        }
-        function toggleProgramFromBtn(btn, idx) {
-            let content = document.getElementById(`keg-${idx}`);
-            if(content) content.style.display = content.style.display === 'block' ? 'none' : 'block';
-        }
+            btnGrafik.querySelector('span:last-child')
+                .textContent = '🔼';
 
-        // --- 💎 FUNGSI ACCORDION + CONFIG GRAFIK PREMIUM ULTRA-ATRAKTIF 💎 ---
-        function aksitoggleGrafikGlobal() {
-            const wadahGrafik = document.getElementById('wadah-grafik-expand');
-            const btnGrafik = document.getElementById('btn-toggle-grafik');
-            const iconTombol = document.getElementById('icon-tombol-grafik');
-            const teksTombol = document.getElementById('teks-tombol-grafik');
-            
-            const sudahTerbuka = wadahGrafik.classList.contains('terbuka');
-            
-            if (sudahTerbuka) {
-                wadahGrafik.classList.remove('terbuka');
-                btnGrafik.classList.remove('aktif');
-                btnGrafik.querySelector('span:last-child').textContent = '🔽';
-                iconTombol.className = "fa-solid fa-chart-line";
-                teksTombol.textContent = "Lihat Grafik Tren Fisik Bulanan OPD";
-                
-                setTimeout(() => {
-                    if (globalChartInstance) {
-                        globalChartInstance.destroy();
-                        globalChartInstance = null;
-                    }
-                }, 400);
-            } else {
-                wadahGrafik.classList.add('terbuka');
-                btnGrafik.classList.add('aktif');
-                btnGrafik.querySelector('span:last-child').textContent = '🔼';
-                iconTombol.className = "fa-solid fa-eye-slash";
-                teksTombol.textContent = "Sembunyikan Grafik Tren";
-                
-                // Mulai inisialisasi rancangan grafik mewah Chart.js
-                setTimeout(() => {
-                    if (!globalChartInstance) {
-                        const canvas = document.getElementById('globalTrendChart');
-                        const ctx = canvas.getContext('2d');
-                        
-                        // 1. MEMBUAT EFEK GRADIENT FILL GLOWING (AREA DI BAWAH GARIS)
-                        const glowGradient = ctx.createLinearGradient(0, 0, 0, canvas.height || 260);
-                        glowGradient.addColorStop(0, 'rgba(12, 107, 220, 0.4)');   // Biru terang atas
-                        glowGradient.addColorStop(0.5, 'rgba(12, 107, 220, 0.12)'); // Meredup di tengah
-                        glowGradient.addColorStop(1, 'rgba(240, 247, 255, 0.01)'); // Transparan total di dasar
+            iconTombol.className =
+                "fa-solid fa-eye-slash";
 
-                        // 2. MEMBUAT GRADIENT WARNA GARIS NYA UTAMA
-                        const lineGradient = ctx.createLinearGradient(0, 0, canvas.width || 600, 0);
-                        lineGradient.addColorStop(0, '#0c6bdc');
-                        lineGradient.addColorStop(0.5, '#00a8ff');
-                        lineGradient.addColorStop(1, '#0f3c78');
+            teksTombol.textContent =
+                "Sembunyikan Grafik Tren";
 
-                        // 3. CONFIGURATION OBJECT CHART.JS PREMIUM STYLE
-                        globalChartInstance = new Chart(ctx, {
+            // ======================================
+            // AUTO GESER KE ATAS
+            // ======================================
+
+            setTimeout(() => {
+
+                document
+                    .getElementById('global-chart-card')
+                    .scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+
+                window.scrollBy({
+                    top: -90,
+                    behavior: 'smooth'
+                });
+
+            }, 250);
+
+            // ======================================
+            // RENDER CHART
+            // ======================================
+
+            setTimeout(() => {
+
+                if (!globalChartInstance) {
+
+                    const canvas =
+                        document.getElementById('globalTrendChart');
+
+                    const ctx = canvas.getContext('2d');
+
+                    const glowGradient =
+                        ctx.createLinearGradient(
+                            0,
+                            0,
+                            0,
+                            canvas.height || 260
+                        );
+
+                    glowGradient.addColorStop(
+                        0,
+                        'rgba(12,107,220,0.4)'
+                    );
+
+                    glowGradient.addColorStop(
+                        1,
+                        'rgba(12,107,220,0.01)'
+                    );
+
+                    const lineGradient =
+                        ctx.createLinearGradient(
+                            0,
+                            0,
+                            canvas.width || 600,
+                            0
+                        );
+
+                    lineGradient.addColorStop(0, '#0c6bdc');
+                    lineGradient.addColorStop(1, '#0f3c78');
+
+                    globalChartInstance =
+                        new Chart(ctx, {
+
                             type: 'line',
+
                             data: {
-                                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'],
+
+                                labels: [
+                                    'Jan','Feb','Mar','Apr',
+                                    'Mei','Jun','Jul','Agt',
+                                    'Sep','Okt','Nov','Des'
+                                ],
+
                                 datasets: [{
-                                    label: 'Rata-rata Fisik (%)',
+
+                                    label: 'Fisik (%)',
+
                                     data: dataTrenTerhitung,
+
                                     borderColor: lineGradient,
+
                                     borderWidth: 3.5,
+
                                     fill: true,
+
                                     backgroundColor: glowGradient,
-                                    tension: 0.38, // Membuat lengkungan meliuk halus profesional
-                                    pointBackgroundColor: '#ffffff',
+
+                                    tension: 0.4,
+
+                                    pointBackgroundColor: '#fff',
+
                                     pointBorderColor: '#0c6bdc',
-                                    pointBorderWidth: 2.5,
-                                    pointRadius: 4.5,
-                                    pointHoverRadius: 7.5,
-                                    pointHoverBackgroundColor: '#0c6bdc',
-                                    pointHoverBorderColor: '#ffffff',
-                                    pointHoverBorderWidth: 3,
-                                    shadowColor: 'rgba(12, 107, 220, 0.3)',
-                                    shadowBlur: 10
+
+                                    pointRadius: 5,
+
+                                    pointHoverRadius: 8
                                 }]
                             },
+
                             options: {
+
                                 responsive: true,
+
                                 maintainAspectRatio: false,
+
                                 plugins: {
-                                    legend: { display: false }, // Hide bawaan legend yang bikin sempit
+
+                                    legend: {
+                                        display: false
+                                    },
+
                                     tooltip: {
-                                        backgroundColor: 'rgba(15, 60, 120, 0.95)', // Background gelap elegan
-                                        titleFont: { size: 13, weight: 'bold', family: 'Segoe UI' },
-                                        bodyFont: { size: 13, family: 'Segoe UI' },
+
+                                        backgroundColor:
+                                            'rgba(15,60,120,0.95)',
+
                                         padding: 12,
+
                                         cornerRadius: 10,
+
                                         displayColors: false,
+
                                         callbacks: {
+
                                             label: function(context) {
-                                                return ` Capaian Fisik: ${context.parsed.y}%`;
+                                                return ` ${context.parsed.y}%`;
                                             }
                                         }
                                     }
                                 },
+
                                 scales: {
+
                                     y: {
+
                                         min: 0,
+
                                         max: 100,
+
                                         ticks: {
+
                                             stepSize: 20,
-                                            color: '#64748b',
-                                            font: { size: 11, weight: '600' },
-                                            callback: function(value) { return value + '%'; }
-                                        },
-                                        grid: {
-                                            color: '#e2e8f0',
-                                            tickLength: 0,
-                                            borderDash: [5, 5] // Membuat grid horizontal putus-putus bersih
+
+                                            callback: function(value) {
+                                                return value + '%';
+                                            }
                                         }
                                     },
+
                                     x: {
-                                        ticks: {
-                                            color: '#475569',
-                                            font: { size: 11, weight: '700' }
-                                        },
-                                        grid: { display: false } // Menghilangkan garis vertikal agar clean
-                                    }
-                                },
-                                animations: {
-                                    tension: {
-                                        duration: 800,
-                                        easing: 'linear'
+                                        grid: {
+                                            display: false
+                                        }
                                     }
                                 }
                             }
                         });
-                    }
-                }, 300);
-            }
-        }
+                }
 
-        // Penjamin data dummy berjalan jika data-opd.json belum siap dipanggil lokal
-        function jaminDataSimulasi() {
-            return {
-                "bappeda": [
-                    { "namaProgram": "Program Perencanaan Pengendalian dan Evaluasi Pembangunan", "pagu": 4500000000, "realisasiBulanIni": 450000000, "realisasiTot": 1800000000, "fisikPersen": 42.50 }
-                ],
-                "kominfo": [
-                    { "namaProgram": "Program Aplikasi Informatika dan Smart City", "pagu": 8200000000, "realisasiBulanIni": 920000000, "realisasiTot": 3600000000, "fisikPersen": 48.10 }
-                ],
-                "bmbk": [
-                    { "namaProgram": "Program Penyelenggaraan Jalan dan Jembatan Provinsi", "pagu": 25000000000, "realisasiBulanIni": 3100000000, "realisasiTot": 9500000000, "fisikPersen": 39.00 }
-                ]
-            };
+            }, 300);
         }
+    }
 
-        window.onload = loadDataOPD;
-    </script>
+    function jaminDataSimulasi() {
+
+        return {
+
+            "bappeda": [
+
+                {
+                    "namaProgram":
+                        "Program Perencanaan",
+
+                    "pagu": 4500000000,
+
+                    "realisasiBulanIni": 450000000,
+
+                    "realisasiTot": 1800000000,
+
+                    "fisikPersen": 42.50
+                }
+            ]
+        };
+    }
+
+    window.onload = loadDataOPD;
+</script>
 </body>
 </html>
