@@ -111,10 +111,21 @@
             flex-shrink: 0;
         }
 
-        .icon-blue { background: #0c6bdc; }
-        .icon-green { background: #28a745; }
-        .icon-orange { background: #ff9800; }
-        .icon-red { background: #e53935; }
+        .icon-blue {
+            background: #0c6bdc;
+        }
+
+        .icon-green {
+            background: #28a745;
+        }
+
+        .icon-orange {
+            background: #ff9800;
+        }
+
+        .icon-red {
+            background: #e53935;
+        }
 
         /* Container Section Title */
         .section-title {
@@ -217,9 +228,11 @@
             margin-top: 15px;
             padding-top: 15px;
             border-top: 1px solid #eee;
+            /* --- Tambahkan kode di bawah ini --- */
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
         }
 
-        /* Kegiatan List Wrapper */
         .sub-kegiatan-wrapper {
             display: none;
             margin-top: 15px;
@@ -227,6 +240,9 @@
             background: #f8fafc;
             border-radius: 12px;
             border-left: 4px solid #28a745;
+            /* --- Tambahkan kode di bawah ini --- */
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
         }
 
         .sub-kegiatan-title {
@@ -332,15 +348,15 @@
             opacity: 0;
             transform: scaleY(0.95);
             transform-origin: top;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                        opacity 0.3s ease, 
-                        transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                        margin-top 0.4s ease;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease,
+                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                margin-top 0.4s ease;
             background: #ffffff;
         }
 
         .grafik-expand-content.terbuka {
-            max-height: 340px; 
+            max-height: 340px;
             opacity: 1;
             transform: scaleY(1);
             margin-top: 20px;
@@ -460,7 +476,8 @@
                     <div class="icon-box icon-orange"><i class="fa-solid fa-folder-open"></i></div>
                     <div class="card-text" style="min-width: 0;">
                         <h4>TOTAL PROGRAM</h4>
-                        <h2 id="total-program-badge" style="margin: 8px 0 0 0; font-size: 16px; color: #1a1a1a; font-weight: 700;">0 Program</h2>
+                        <h2 id="total-program-badge"
+                            style="margin: 8px 0 0 0; font-size: 16px; color: #1a1a1a; font-weight: 700;">0 Program</h2>
                     </div>
                 </div>
             </div>
@@ -469,7 +486,9 @@
                     <div class="icon-box icon-blue"><i class="fa-solid fa-list-check"></i></div>
                     <div class="card-text" style="min-width: 0;">
                         <h4>TOTAL KEGIATAN</h4>
-                        <h2 id="total-kegiatan-badge" style="margin: 8px 0 0 0; font-size: 16px; color: #1a1a1a; font-weight: 700;">0 Kegiatan</h2>
+                        <h2 id="total-kegiatan-badge"
+                            style="margin: 8px 0 0 0; font-size: 16px; color: #1a1a1a; font-weight: 700;">0 Kegiatan
+                        </h2>
                     </div>
                 </div>
             </div>
@@ -477,9 +496,10 @@
 
         <div class="card" id="global-chart-card" style="display: none; border: 1px solid #e3e6f0;">
             <button class="btn-grafik-trigger" id="btn-toggle-grafik" onclick="putarSuara(); aksitoggleGrafikGlobal()">
-                <i class="fa-solid fa-chart-line" id="icon-tombol-grafik"></i> <span id="teks-tombol-grafik">Lihat Grafik Tren Fisik Bulanan OPD</span> <span>🔽</span>
+                <i class="fa-solid fa-chart-line" id="icon-tombol-grafik"></i> <span id="teks-tombol-grafik">Lihat
+                    Grafik Tren Fisik Bulanan OPD</span> <span>🔽</span>
             </button>
-            
+
             <div class="grafik-expand-content" id="wadah-grafik-expand">
                 <div class="chart-container">
                     <canvas id="globalTrendChart"></canvas>
@@ -494,144 +514,145 @@
     </div>
 
     <div class="footer">
-        Sumber Data: <a href="https://sulselprov.e-planning.id" style="color:#6ab0ff; text-decoration:none;">sulselprov.e-planning.id</a> <br>
+        Sumber Data: <a href="https://sulselprov.e-planning.id"
+            style="color:#6ab0ff; text-decoration:none;">sulselprov.e-planning.id</a> <br>
         &copy; 2026 by @zuwlend. All Rights Reserved.
         <div id="visitorCount" style="margin-top:8px; opacity:0.8;"></div>
     </div>
 
     <script>
-    const audioKlik = new Audio('tap_sound.mp3');
-        
-    function putarSuara() {
-        audioKlik.currentTime = 0;
-        audioKlik.play().catch(e => {});
-    }
- 
-    // 1. STATE GLOBAL & KONFIGURASI
-    let seluruhDataOPD = {};
-    let opdAktif = "";
-    let dataTrenTerhitung = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    let globalChartInstance = null;
- 
-    // 2. INITIALIZATION DATA JSON
-    document.addEventListener("DOMContentLoaded", function() {
-        fetch('data-opd.json')
-            .then(response => {
-                if (!response.ok) throw new Error('Gagal memuat file data-opd.json');
-                return response.json();
-            })
-            .then(data => {
-                seluruhDataOPD = data;
-                console.log("Data JSON Berhasil Dimuat:", seluruhDataOPD);
-            })
-            .catch(error => {
-                console.error("Error Fetch Data:", error);
-                alert("Gagal memuat data OPD. Pastikan file 'data-opd.json' berada di folder yang sama.");
-            });
-    });
- 
-    // 3. DROPDOWN HANDLER
-    function gantiOPD(pilihan) {
-        putarSuara();
-        opdAktif = pilihan;
-        renderDashboard();
-    }
- 
-    // 4. RENDERING DASHBOARD UTAMA
-    function renderDashboard() {
-        let grandTotalPagu = 0;
-        let grandTotalRealisasi = 0;
-        let totalKegiatanCount = 0;
- 
-        const mainContainer = document.getElementById('program-list');
-        const chartCard = document.getElementById('global-chart-card');
-        const wadahGrafik = document.getElementById('wadah-grafik-expand');
-        const btnGrafik = document.getElementById('btn-toggle-grafik');
-        const iconTombol = document.getElementById('icon-tombol-grafik');
-        const teksTombol = document.getElementById('teks-tombol-grafik');
-        
-        mainContainer.innerHTML = '';
-        
-        // Reset state grafik area
-        chartCard.style.display = "none";
-        wadahGrafik.classList.remove('terbuka');
-        btnGrafik.classList.remove('aktif');
-        if (btnGrafik.querySelector('span:last-child')) btnGrafik.querySelector('span:last-child').textContent = '🔽';
-        iconTombol.className = "fa-solid fa-chart-line";
-        teksTombol.textContent = "Lihat Grafik Tren Fisik Bulanan OPD";
-        
-        if (globalChartInstance) {
-            globalChartInstance.destroy();
-            globalChartInstance = null;
+        const audioKlik = new Audio('tap_sound.mp3');
+
+        function putarSuara() {
+            audioKlik.currentTime = 0;
+            audioKlik.play().catch(e => { });
         }
- 
-        const selector = document.getElementById('opd-selector');
-        const headerLogo = document.getElementById('header-logo-img');
-        const headerTitle = document.getElementById('header-title-text');
- 
-        if (opdAktif === "") {
-            headerLogo.src = "assets/logo-infras.png";
-            headerTitle.textContent = "Dashboard Progres Realisasi Fisik & Keuangan 8 OPD Mitra";
-            document.getElementById('total-pagu-label').textContent = "Rp 0";
-            document.getElementById('total-realisasi-label').textContent = "Rp 0";
-            document.getElementById('sisa-pagu-label').textContent = "Rp 0";
-            document.getElementById('total-program-badge').textContent = "0 Program";
-            document.getElementById('total-kegiatan-badge').textContent = "0 Kegiatan";
-            document.getElementById('nama-opd-title').textContent = "Rincian Progres per Program: Silahkan pilih OPD terlebih dahulu";
-            mainContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">Belum ada OPD yang dipilih. Silakan pilih OPD pada menu di atas.</div>';
-            return;
+
+        // 1. STATE GLOBAL & KONFIGURASI
+        let seluruhDataOPD = {};
+        let opdAktif = "";
+        let dataTrenTerhitung = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        let globalChartInstance = null;
+
+        // 2. INITIALIZATION DATA JSON
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('data-opd.json')
+                .then(response => {
+                    if (!response.ok) throw new Error('Gagal memuat file data-opd.json');
+                    return response.json();
+                })
+                .then(data => {
+                    seluruhDataOPD = data;
+                    console.log("Data JSON Berhasil Dimuat:", seluruhDataOPD);
+                })
+                .catch(error => {
+                    console.error("Error Fetch Data:", error);
+                    alert("Gagal memuat data OPD. Pastikan file 'data-opd.json' berada di folder yang sama.");
+                });
+        });
+
+        // 3. DROPDOWN HANDLER
+        function gantiOPD(pilihan) {
+            putarSuara();
+            opdAktif = pilihan;
+            renderDashboard();
         }
- 
-        const namaOPDTerpilih = selector.options[selector.selectedIndex].text;
-        headerTitle.textContent = `Dashboard Progres Realisasi Fisik & Keuangan ${namaOPDTerpilih}`;
-        headerLogo.src = "assets/logo-" + opdAktif + ".png";
- 
-        const dataDipilih = seluruhDataOPD[opdAktif] || [];
- 
-        if (dataDipilih.length === 0) {
-            document.getElementById('total-pagu-label').textContent = "Rp 0";
-            document.getElementById('total-realisasi-label').textContent = "Rp 0";
-            document.getElementById('sisa-pagu-label').textContent = "Rp 0";
-            document.getElementById('total-program-badge').textContent = "0 Program";
-            document.getElementById('total-kegiatan-badge').textContent = "0 Kegiatan";
-            document.getElementById('nama-opd-title').textContent = `Rincian Progres per Program: ${namaOPDTerpilih}`;
-            mainContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">Data rincian program untuk OPD ini belum tersedia.</div>';
-            return;
-        }
- 
-        let akumulasiTrenBulanan = Array(12).fill(0);
-        let jumlahProgramDenganTren = 0;
- 
-        dataDipilih.forEach((item, index) => {
-            const keuPersen = item.pagu > 0 ? ((item.realisasiTot / item.pagu) * 100).toFixed(2) : 0;
-            const sisa = item.pagu - item.realisasiTot;
- 
-            grandTotalPagu += item.pagu;
-            grandTotalRealisasi += item.realisasiTot;
-            totalKegiatanCount += item.subKegiatan.length;
- 
-            if (!item.progresBulanan) {
-                item.progresBulanan = [];
-                for (let i = 0; i < 12; i++) {
-                    if (i <= 4) { 
-                        let step = item.fisikPersen / 5;
-                        item.progresBulanan.push(Number((step * (i + 1)).toFixed(2)));
-                    } else { 
-                        item.progresBulanan.push(item.fisikPersen);
+
+        // 4. RENDERING DASHBOARD UTAMA
+        function renderDashboard() {
+            let grandTotalPagu = 0;
+            let grandTotalRealisasi = 0;
+            let totalKegiatanCount = 0;
+
+            const mainContainer = document.getElementById('program-list');
+            const chartCard = document.getElementById('global-chart-card');
+            const wadahGrafik = document.getElementById('wadah-grafik-expand');
+            const btnGrafik = document.getElementById('btn-toggle-grafik');
+            const iconTombol = document.getElementById('icon-tombol-grafik');
+            const teksTombol = document.getElementById('teks-tombol-grafik');
+
+            mainContainer.innerHTML = '';
+
+            // Reset state grafik area
+            chartCard.style.display = "none";
+            wadahGrafik.classList.remove('terbuka');
+            btnGrafik.classList.remove('aktif');
+            if (btnGrafik.querySelector('span:last-child')) btnGrafik.querySelector('span:last-child').textContent = '🔽';
+            iconTombol.className = "fa-solid fa-chart-line";
+            teksTombol.textContent = "Lihat Grafik Tren Fisik Bulanan OPD";
+
+            if (globalChartInstance) {
+                globalChartInstance.destroy();
+                globalChartInstance = null;
+            }
+
+            const selector = document.getElementById('opd-selector');
+            const headerLogo = document.getElementById('header-logo-img');
+            const headerTitle = document.getElementById('header-title-text');
+
+            if (opdAktif === "") {
+                headerLogo.src = "assets/logo-infras.png";
+                headerTitle.textContent = "Dashboard Progres Realisasi Fisik & Keuangan 8 OPD Mitra";
+                document.getElementById('total-pagu-label').textContent = "Rp 0";
+                document.getElementById('total-realisasi-label').textContent = "Rp 0";
+                document.getElementById('sisa-pagu-label').textContent = "Rp 0";
+                document.getElementById('total-program-badge').textContent = "0 Program";
+                document.getElementById('total-kegiatan-badge').textContent = "0 Kegiatan";
+                document.getElementById('nama-opd-title').textContent = "Rincian Progres per Program: Silahkan pilih OPD terlebih dahulu";
+                mainContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">Belum ada OPD yang dipilih. Silakan pilih OPD pada menu di atas.</div>';
+                return;
+            }
+
+            const namaOPDTerpilih = selector.options[selector.selectedIndex].text;
+            headerTitle.textContent = `Dashboard Progres Realisasi Fisik & Keuangan ${namaOPDTerpilih}`;
+            headerLogo.src = "assets/logo-" + opdAktif + ".png";
+
+            const dataDipilih = seluruhDataOPD[opdAktif] || [];
+
+            if (dataDipilih.length === 0) {
+                document.getElementById('total-pagu-label').textContent = "Rp 0";
+                document.getElementById('total-realisasi-label').textContent = "Rp 0";
+                document.getElementById('sisa-pagu-label').textContent = "Rp 0";
+                document.getElementById('total-program-badge').textContent = "0 Program";
+                document.getElementById('total-kegiatan-badge').textContent = "0 Kegiatan";
+                document.getElementById('nama-opd-title').textContent = `Rincian Progres per Program: ${namaOPDTerpilih}`;
+                mainContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">Data rincian program untuk OPD ini belum tersedia.</div>';
+                return;
+            }
+
+            let akumulasiTrenBulanan = Array(12).fill(0);
+            let jumlahProgramDenganTren = 0;
+
+            dataDipilih.forEach((item, index) => {
+                const keuPersen = item.pagu > 0 ? ((item.realisasiTot / item.pagu) * 100).toFixed(2) : 0;
+                const sisa = item.pagu - item.realisasiTot;
+
+                grandTotalPagu += item.pagu;
+                grandTotalRealisasi += item.realisasiTot;
+                totalKegiatanCount += item.subKegiatan.length;
+
+                if (!item.progresBulanan) {
+                    item.progresBulanan = [];
+                    for (let i = 0; i < 12; i++) {
+                        if (i <= 4) {
+                            let step = item.fisikPersen / 5;
+                            item.progresBulanan.push(Number((step * (i + 1)).toFixed(2)));
+                        } else {
+                            item.progresBulanan.push(item.fisikPersen);
+                        }
                     }
                 }
-            }
- 
-            if (item.progresBulanan && item.progresBulanan.length === 12) {
-                for(let i=0; i<12; i++) { akumulasiTrenBulanan[i] += item.progresBulanan[i]; }
-                jumlahProgramDenganTren++;
-            }
- 
-            // KONSTRUKSI KARTU UTAMA (LEBAR TOMBOL SUPER RAMPING UNTUK HP)
-            const programCard = document.createElement('div');
-            programCard.className = 'card inner-card';
- 
-            programCard.innerHTML = `
+
+                if (item.progresBulanan && item.progresBulanan.length === 12) {
+                    for (let i = 0; i < 12; i++) { akumulasiTrenBulanan[i] += item.progresBulanan[i]; }
+                    jumlahProgramDenganTren++;
+                }
+
+                // KONSTRUKSI KARTU UTAMA (LEBAR TOMBOL SUPER RAMPING UNTUK HP)
+                const programCard = document.createElement('div');
+                programCard.className = 'card inner-card';
+
+                programCard.innerHTML = `
                 <div class="program-header" onclick="putarSuara(); toggleProgram(this, ${index})" style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 12px;">
                     
                     <div style="flex: 1; min-width: 0; word-break: break-word;">
@@ -666,13 +687,13 @@
                     <div class="sub-kegiatan-container"></div>
                 </div>
             `;
-            mainContainer.appendChild(programCard);
- 
-            const subContainer = programCard.querySelector(`#sub-list-${index} .sub-kegiatan-container`);
-            item.subKegiatan.forEach((sub) => {
-                const subKeuPct = sub.pagu > 0 ? ((sub.realisasi / sub.pagu) * 100).toFixed(2) : 0;
-                const subSisa = sub.pagu - sub.realisasi;
-                subContainer.innerHTML += `
+                mainContainer.appendChild(programCard);
+
+                const subContainer = programCard.querySelector(`#sub-list-${index} .sub-kegiatan-container`);
+                item.subKegiatan.forEach((sub) => {
+                    const subKeuPct = sub.pagu > 0 ? ((sub.realisasi / sub.pagu) * 100).toFixed(2) : 0;
+                    const subSisa = sub.pagu - sub.realisasi;
+                    subContainer.innerHTML += `
                     <div class="sub-kegiatan-block">
                         <div class="sub-kegiatan-name-header">
                             <div class="sub-kegiatan-name-text">
@@ -695,225 +716,226 @@
                         </div>
                     </div>
                 `;
+                });
             });
-        });
- 
-        dataTrenTerhitung = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        if (jumlahProgramDenganTren > 0) {
-            dataTrenTerhitung = akumulasiTrenBulanan.map(val => Number((val / jumlahProgramDenganTren).toFixed(2)));
-        }
- 
-        chartCard.style.display = "block";
- 
-        document.getElementById('total-pagu-label').textContent = `Rp ${grandTotalPagu.toLocaleString('id-ID')}`;
-        document.getElementById('total-realisasi-label').textContent = `Rp ${grandTotalRealisasi.toLocaleString('id-ID')}`;
-        document.getElementById('sisa-pagu-label').textContent = `Rp ${(grandTotalPagu - grandTotalRealisasi).toLocaleString('id-ID')}`;
-        document.getElementById('total-program-badge').textContent = `${dataDipilih.length} Program`;
-        document.getElementById('total-kegiatan-badge').textContent = `${totalKegiatanCount} Kegiatan`;
-        document.getElementById('nama-opd-title').textContent = `Rincian Progres per Program: ${namaOPDTerpilih}`;
-    }
- 
-    // 5. SYNCHRONIZED TOGGLE FUNCTION UNTUK GRAFIK TREN
-    function aksitoggleGrafikGlobal() {
-        putarSuara();
-        const wadahGrafik = document.getElementById('wadah-grafik-expand');
-        const btnGrafik = document.getElementById('btn-toggle-grafik');
-        const iconTombol = document.getElementById('icon-tombol-grafik');
-        const teksTombol = document.getElementById('teks-tombol-grafik');
-        
-        wadahGrafik.classList.toggle('terbuka');
-        btnGrafik.classList.toggle('aktif');
-        
-        if (wadahGrafik.classList.contains('terbuka')) {
-            if (btnGrafik.querySelector('span:last-child')) btnGrafik.querySelector('span:last-child').textContent = '🔼';
-            iconTombol.className = "fa-solid fa-eye-slash";
-            teksTombol.textContent = "Sembunyikan Grafik Tren Fisik Bulanan OPD";
-            initChart();
-        } else {
-            if (btnGrafik.querySelector('span:last-child')) btnGrafik.querySelector('span:last-child').textContent = '🔽';
-            iconTombol.className = "fa-solid fa-chart-line";
-            teksTombol.textContent = "Lihat Grafik Tren Fisik Bulanan OPD";
-        }
-    }
- 
-    // 6. INITIALIZATION GRAFIK VERTIKAL
-    function initChart() {
-        const ctx = document.getElementById('globalTrendChart').getContext('2d');
-        
-        if (globalChartInstance) {
-            globalChartInstance.destroy();
-        }
-        
-        const gradientOrange = ctx.createLinearGradient(0, 0, 300, 0);
-        gradientOrange.addColorStop(0, 'rgba(255, 87, 34, 0.4)');
-        gradientOrange.addColorStop(1, 'rgba(255, 87, 34, 0.0)');
-        
-        globalChartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
-                datasets: [{
-                    label: 'Progres Fisik Rata-rata (%)',
-                    data: dataTrenTerhitung,
-                    borderColor: '#ff5722',
-                    borderWidth: 3,
-                    backgroundColor: gradientOrange,
-                    fill: true,
-                    tension: 0.3,
-                    pointBackgroundColor: '#ff5722',
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }]
-            },
-            options: {
-                indexAxis: 'y', 
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: { callback: function(value) { return value + '%'; } }
-                    },
-                    y: {
-                        reverse: true, 
-                        ticks: { color: '#334155', font: { weight: 'bold' } }
-                    }
-                }
-            }
-        });
-    }
- 
-    // 7. CONTROLLER INTERAKSI - TERINTEGRASI SEMBUNYIKAN PROGRAM JIKA KEGIATAN AKTIF
-    function toggleProgram(header, index) {
-        const content = document.getElementById(`keg-${index}`);
-        const btnDetail = header.querySelector('.toggle-btn');
-        const btnKeg = header.querySelector('.kegiatan-btn');
-        const wrapper = document.getElementById(`sub-list-${index}`);
-        
-        header.classList.toggle('active');
-        
-        if (header.classList.contains('active')) {
-            if (btnDetail) {
-                btnDetail.textContent = "Tutup";
-                btnDetail.style.background = "#ff9800"; 
-                btnDetail.style.borderColor = "#e65100";
-            }
-            if (btnKeg) {
-                btnKeg.style.display = "inline-block"; 
-            }
-            content.style.display = 'block';
-            content.style.maxHeight = content.scrollHeight + "px";
-            setTimeout(() => {
-                if (header.classList.contains('active')) content.style.maxHeight = 'none';
-            }, 250);
-        } else {
-            if (btnDetail) {
-                btnDetail.textContent = "Detail";
-                btnDetail.style.background = "#0c6bdc"; 
-                btnDetail.style.borderColor = "#0a56b2";
-            }
-            if (btnKeg) {
-                btnKeg.style.display = "none"; 
-                btnKeg.classList.remove('aktif');
-                btnKeg.textContent = "Kegiatan";
-                btnKeg.style.background = "#28a745";
-                btnKeg.style.borderColor = "#1e7e34";
-            }
-            
-            if (wrapper && wrapper.style.display !== 'none') {
-                wrapper.style.maxHeight = wrapper.scrollHeight + "px";
-                setTimeout(() => {
-                    wrapper.style.maxHeight = '0px';
-                    setTimeout(() => { wrapper.style.display = 'none'; }, 200);
-                }, 10);
+
+            dataTrenTerhitung = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            if (jumlahProgramDenganTren > 0) {
+                dataTrenTerhitung = akumulasiTrenBulanan.map(val => Number((val / jumlahProgramDenganTren).toFixed(2)));
             }
 
-            content.style.maxHeight = content.scrollHeight + "px";
-            setTimeout(() => {
-                content.style.maxHeight = '0px';
-                setTimeout(() => { content.style.display = 'none'; }, 200);
-            }, 10);
+            chartCard.style.display = "block";
+
+            document.getElementById('total-pagu-label').textContent = `Rp ${grandTotalPagu.toLocaleString('id-ID')}`;
+            document.getElementById('total-realisasi-label').textContent = `Rp ${grandTotalRealisasi.toLocaleString('id-ID')}`;
+            document.getElementById('sisa-pagu-label').textContent = `Rp ${(grandTotalPagu - grandTotalRealisasi).toLocaleString('id-ID')}`;
+            document.getElementById('total-program-badge').textContent = `${dataDipilih.length} Program`;
+            document.getElementById('total-kegiatan-badge').textContent = `${totalKegiatanCount} Kegiatan`;
+            document.getElementById('nama-opd-title').textContent = `Rincian Progres per Program: ${namaOPDTerpilih}`;
         }
-    }
- 
-    function toggleProgramFromBtn(btn, index) {
-        const header = btn.closest('.program-header');
-        toggleProgram(header, index);
-    }
- 
-    function toggleKegiatanData(btn, index) {
-        const wrapper = document.getElementById(`sub-list-${index}`);
-        const content = document.getElementById(`keg-${index}`);
-        
-        btn.classList.toggle('aktif');
-        
-        if (btn.classList.contains('aktif')) {
-            btn.textContent = "Tutup Kegiatan";
-            btn.style.background = "#00bcd4"; 
-            btn.style.borderColor = "#0097a7";
-            
-            // HILANGKAN INFORMASI PROGRAM (Collapse panel detail program)
-            if (content) {
+
+        // 5. SYNCHRONIZED TOGGLE FUNCTION UNTUK GRAFIK TREN
+        function aksitoggleGrafikGlobal() {
+            putarSuara();
+            const wadahGrafik = document.getElementById('wadah-grafik-expand');
+            const btnGrafik = document.getElementById('btn-toggle-grafik');
+            const iconTombol = document.getElementById('icon-tombol-grafik');
+            const teksTombol = document.getElementById('teks-tombol-grafik');
+
+            wadahGrafik.classList.toggle('terbuka');
+            btnGrafik.classList.toggle('aktif');
+
+            if (wadahGrafik.classList.contains('terbuka')) {
+                if (btnGrafik.querySelector('span:last-child')) btnGrafik.querySelector('span:last-child').textContent = '🔼';
+                iconTombol.className = "fa-solid fa-eye-slash";
+                teksTombol.textContent = "Sembunyikan Grafik Tren Fisik Bulanan OPD";
+                initChart();
+            } else {
+                if (btnGrafik.querySelector('span:last-child')) btnGrafik.querySelector('span:last-child').textContent = '🔽';
+                iconTombol.className = "fa-solid fa-chart-line";
+                teksTombol.textContent = "Lihat Grafik Tren Fisik Bulanan OPD";
+            }
+        }
+
+        // 6. INITIALIZATION GRAFIK VERTIKAL
+        function initChart() {
+            const ctx = document.getElementById('globalTrendChart').getContext('2d');
+
+            if (globalChartInstance) {
+                globalChartInstance.destroy();
+            }
+
+            const gradientOrange = ctx.createLinearGradient(0, 0, 300, 0);
+            gradientOrange.addColorStop(0, 'rgba(255, 87, 34, 0.4)');
+            gradientOrange.addColorStop(1, 'rgba(255, 87, 34, 0.0)');
+
+            globalChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
+                    datasets: [{
+                        label: 'Progres Fisik Rata-rata (%)',
+                        data: dataTrenTerhitung,
+                        borderColor: '#ff5722',
+                        borderWidth: 3,
+                        backgroundColor: gradientOrange,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#ff5722',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { callback: function (value) { return value + '%'; } }
+                        },
+                        y: {
+                            reverse: true,
+                            ticks: { color: '#334155', font: { weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 7. CONTROLLER INTERAKSI - TERINTEGRASI SEMBUNYIKAN PROGRAM JIKA KEGIATAN AKTIF
+        function toggleProgram(header, index) {
+            const content = document.getElementById(`keg-${index}`);
+            const btnDetail = header.querySelector('.toggle-btn');
+            const btnKeg = header.querySelector('.kegiatan-btn');
+            const wrapper = document.getElementById(`sub-list-${index}`);
+
+            header.classList.toggle('active');
+
+            if (header.classList.contains('active')) {
+                if (btnDetail) {
+                    btnDetail.textContent = "Tutup";
+                    btnDetail.style.background = "#ff9800";
+                    btnDetail.style.borderColor = "#e65100";
+                }
+                if (btnKeg) {
+                    btnKeg.style.display = "inline-block";
+                }
+                content.style.display = 'block';
+                content.style.maxHeight = content.scrollHeight + "px";
+                setTimeout(() => {
+                    if (header.classList.contains('active')) content.style.maxHeight = 'none';
+                }, 250);
+            } else {
+                if (btnDetail) {
+                    btnDetail.textContent = "Detail";
+                    btnDetail.style.background = "#0c6bdc";
+                    btnDetail.style.borderColor = "#0a56b2";
+                }
+                if (btnKeg) {
+                    btnKeg.style.display = "none";
+                    btnKeg.classList.remove('aktif');
+                    btnKeg.textContent = "Kegiatan";
+                    btnKeg.style.background = "#28a745";
+                    btnKeg.style.borderColor = "#1e7e34";
+                }
+
+                if (wrapper && wrapper.style.display !== 'none') {
+                    wrapper.style.maxHeight = wrapper.scrollHeight + "px";
+                    setTimeout(() => {
+                        wrapper.style.maxHeight = '0px';
+                        setTimeout(() => { wrapper.style.display = 'none'; }, 200);
+                    }, 10);
+                }
+
                 content.style.maxHeight = content.scrollHeight + "px";
                 setTimeout(() => {
                     content.style.maxHeight = '0px';
                     setTimeout(() => { content.style.display = 'none'; }, 200);
                 }, 10);
             }
-            
-            // Tampilkan deretan Kegiatan
-            wrapper.style.display = 'block';
-            wrapper.style.maxHeight = wrapper.scrollHeight + "px";
-            setTimeout(() => {
-                if (btn.classList.contains('aktif')) wrapper.style.maxHeight = 'none';
-            }, 250);
-        } else {
-            btn.textContent = "Kegiatan";
-            btn.style.background = "#28a745"; 
-            btn.style.borderColor = "#1e7e34";
-            
-            // KEMBALIKAN INFORMASI PROGRAM saat Kegiatan ditutup
-            if (content) {
+        }
+
+        function toggleProgramFromBtn(btn, index) {
+            const header = btn.closest('.program-header');
+            toggleProgram(header, index);
+        }
+
+        function toggleKegiatanData(btn, index) {
+            const wrapper = document.getElementById(`sub-list-${index}`);
+            const content = document.getElementById(`keg-${index}`);
+
+            btn.classList.toggle('aktif');
+
+            if (btn.classList.contains('aktif')) {
+                btn.textContent = "Tutup Kegiatan";
+                btn.style.background = "#00bcd4";
+                btn.style.borderColor = "#0097a7";
+
+                // HILANGKAN INFORMASI PROGRAM (Collapse panel detail program)
+                if (content) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    setTimeout(() => {
+                        content.style.maxHeight = '0px';
+                        setTimeout(() => { content.style.display = 'none'; }, 200);
+                    }, 10);
+                }
+
+                // Tampilkan deretan Kegiatan
+                wrapper.style.display = 'block';
+                wrapper.style.maxHeight = wrapper.scrollHeight + "px";
+                setTimeout(() => {
+                    if (btn.classList.contains('aktif')) wrapper.style.maxHeight = 'none';
+                }, 250);
+            } else {
+                btn.textContent = "Kegiatan";
+                btn.style.background = "#28a745";
+                btn.style.borderColor = "#1e7e34";
+
+                // KEMBALIKAN INFORMASI PROGRAM saat Kegiatan ditutup
+                if (content) {
+                    content.style.display = 'block';
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    setTimeout(() => {
+                        content.style.maxHeight = 'none';
+                    }, 250);
+                }
+
+                wrapper.style.maxHeight = wrapper.scrollHeight + "px";
+                setTimeout(() => {
+                    wrapper.style.maxHeight = '0px';
+                    setTimeout(() => { wrapper.style.display = 'none'; }, 200);
+                }, 10);
+            }
+        }
+
+        function toggleSubDetailCard(btn) {
+            const block = btn.closest('.sub-kegiatan-block');
+            const content = block.querySelector('.sub-kegiatan-cards-content');
+            btn.classList.toggle('aktif');
+
+            if (btn.classList.contains('aktif')) {
+                btn.textContent = "Tutup";
                 content.style.display = 'block';
                 content.style.maxHeight = content.scrollHeight + "px";
                 setTimeout(() => {
-                    content.style.maxHeight = 'none';
+                    if (btn.classList.contains('aktif')) content.style.maxHeight = 'none';
                 }, 250);
+            } else {
+                btn.textContent = "Detail";
+                content.style.maxHeight = content.scrollHeight + "px";
+                setTimeout(() => {
+                    content.style.maxHeight = '0px';
+                    setTimeout(() => { content.style.display = 'none'; }, 200);
+                }, 10);
             }
-            
-            wrapper.style.maxHeight = wrapper.scrollHeight + "px";
-            setTimeout(() => {
-                wrapper.style.maxHeight = '0px';
-                setTimeout(() => { wrapper.style.display = 'none'; }, 200);
-            }, 10);
         }
-    }
- 
-    function toggleSubDetailCard(btn) {
-        const block = btn.closest('.sub-kegiatan-block');
-        const content = block.querySelector('.sub-kegiatan-cards-content');
-        btn.classList.toggle('aktif');
-        
-        if (btn.classList.contains('aktif')) {
-            btn.textContent = "Tutup";
-            content.style.display = 'block';
-            content.style.maxHeight = content.scrollHeight + "px";
-            setTimeout(() => {
-                if (btn.classList.contains('aktif')) content.style.maxHeight = 'none';
-            }, 250);
-        } else {
-            btn.textContent = "Detail";
-            content.style.maxHeight = content.scrollHeight + "px";
-            setTimeout(() => {
-                content.style.maxHeight = '0px';
-                setTimeout(() => { content.style.display = 'none'; }, 200);
-            }, 10);
-        }
-    }
-</script>
+    </script>
 </body>
+
 </html>
