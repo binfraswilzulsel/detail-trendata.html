@@ -7,6 +7,7 @@
     <title>Dashboard Multi-OPD Terintegrasi Provinsi Sulsel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <style>
         /* CSS UTAMA */
         * {
@@ -761,58 +762,73 @@
         }
     }
  
-    // 6. INITIALIZATION GRAFIK VERTIKAL
-    function initChart() {
-        const canvas = document.getElementById('globalTrendChart');
-        if(!canvas) return;
-        const ctx = canvas.getContext('2d');
-        
-        if (globalChartInstance) {
-            globalChartInstance.destroy();
-        }
-        
-        const gradientOrange = ctx.createLinearGradient(0, 0, 300, 0);
-        gradientOrange.addColorStop(0, 'rgba(255, 87, 34, 0.4)');
-        gradientOrange.addColorStop(1, 'rgba(255, 87, 34, 0.0)');
-        
-        globalChartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
-                datasets: [{
-                    label: 'Progres Fisik Rata-rata (%)',
-                    data: dataTrenTerhitung,
-                    borderColor: '#ff5722',
-                    borderWidth: 3,
-                    backgroundColor: gradientOrange,
-                    fill: true,
-                    tension: 0.3,
-                    pointBackgroundColor: '#ff5722',
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }]
-            },
-            options: {
-                indexAxis: 'y', 
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: { callback: function(value) { return value + '%'; } }
+    // 6. INITIALIZATION GRAFIK VERTIKAL (ANGKA MINIMALIS TANPA BACKGROUND)
+function initChart() {
+    const canvas = document.getElementById('globalTrendChart');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    if (globalChartInstance) {
+        globalChartInstance.destroy();
+    }
+    
+    const gradientOrange = ctx.createLinearGradient(0, 0, 300, 0);
+    gradientOrange.addColorStop(0, 'rgba(255, 87, 34, 0.4)');
+    gradientOrange.addColorStop(1, 'rgba(255, 87, 34, 0.0)');
+    
+    globalChartInstance = new Chart(ctx, {
+        type: 'line',
+        plugins: [ChartDataLabels], // Memakai plugin datalabels
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
+            datasets: [{
+                label: 'Progres Fisik Rata-rata (%)',
+                data: dataTrenTerhitung,
+                borderColor: '#ff5722',
+                borderWidth: 3,
+                backgroundColor: gradientOrange,
+                fill: true,
+                tension: 0.3,
+                pointBackgroundColor: '#ff5722',
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            indexAxis: 'y', 
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                // --- KONFIGURASI ANGKA MINIMALIS ---
+                datalabels: {
+                    display: true,
+                    align: 'right', // Posisi di sebelah kanan tepat setelah dot
+                    offset: 4,      // Jarak spasi (jarak aman) antara dot dan angka agar tidak menempel
+                    color: '#334155', // Warna teks angka abu-abu gelap/hitam agar kontras
+                    font: {
+                        weight: 'bold',
+                        size: 11 // Ukuran tulisan angka
                     },
-                    y: {
-                        reverse: true, 
-                        ticks: { color: '#334155', font: { weight: 'bold' } }
+                    formatter: function(value) {
+                        return value + '%'; // Menampilkan lambang % di belakang angka
                     }
                 }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 110, // Memberikan sedikit ruang di kanan agar angka Desember tidak terpotong tepi canvas
+                    ticks: { callback: function(value) { return value <= 100 ? value + '%' : ''; } }
+                },
+                y: {
+                    reverse: true, 
+                    ticks: { color: '#334155', font: { weight: 'bold' } }
+                }
             }
-        });
-    }
+        }
+    });
+}
  
     // 7. CONTROLLER INTERAKSI ANIMASI AKORDION BERSIH TANPA OVERLAP
     function toggleProgram(header, index) {
