@@ -966,6 +966,29 @@
                 if (wrapper) wrapper.style.display = 'none';
             }
         }
+        // 8. FUNGSI TOGGLE DETAIL SUB-KEGIATAN (Daftar Kegiatan)
+        function toggleSubDetailCard(btn) {
+            // Mencari block sub-kegiatan terdekat
+            const block = btn.closest('.sub-kegiatan-block');
+            if (!block) return;
+            
+            // Mencari konten detail di dalam block tersebut
+            const content = block.querySelector('.sub-kegiatan-cards-content');
+            if (!content) return;
+
+            // Jalankan aksi toggle tampil/sembunyi
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+                btn.textContent = "Tutup";
+                btn.style.background = "#e53935"; // Mengubah tombol jadi merah saat terbuka (opsional)
+                btn.style.borderColor = "#b71c1c";
+            } else {
+                content.style.display = 'none';
+                btn.textContent = "Detail";
+                btn.style.background = "#28a745"; // Kembalikan jadi hijau saat ditutup
+                btn.style.borderColor = "#1e7e34";
+            }
+        }
 </script>
 </body>
 
