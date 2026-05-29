@@ -521,421 +521,479 @@
     </div>
 
     <script>
-        const audioKlik = new Audio('tap_sound.mp3');
-
-        function putarSuara() {
-            audioKlik.currentTime = 0;
-            audioKlik.play().catch(e => { });
-        }
-
-        // 1. STATE GLOBAL & KONFIGURASI
-        let seluruhDataOPD = {};
-        let opdAktif = "";
-        let dataTrenTerhitung = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        let globalChartInstance = null;
-
-        // 2. INITIALIZATION DATA JSON
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch('data-opd.json')
-                .then(response => {
-                    if (!response.ok) throw new Error('Gagal memuat file data-opd.json');
-                    return response.json();
-                })
-                .then(data => {
-                    seluruhDataOPD = data;
-                    console.log("Data JSON Berhasil Dimuat:", seluruhDataOPD);
-                })
-                .catch(error => {
-                    console.error("Error Fetch Data:", error);
-                    alert("Gagal memuat data OPD. Pastikan file 'data-opd.json' berada di folder yang sama.");
-                });
-        });
-
-        // 3. DROPDOWN HANDLER
-        function gantiOPD(pilihan) {
-            putarSuara();
-            opdAktif = pilihan;
-            renderDashboard();
-        }
-
-        // 4. RENDERING DASHBOARD UTAMA
-        function renderDashboard() {
-            let grandTotalPagu = 0;
-            let grandTotalRealisasi = 0;
-            let totalKegiatanCount = 0;
-
-            const mainContainer = document.getElementById('program-list');
-            const chartCard = document.getElementById('global-chart-card');
-            const wadahGrafik = document.getElementById('wadah-grafik-expand');
-            const btnGrafik = document.getElementById('btn-toggle-grafik');
-            const iconTombol = document.getElementById('icon-tombol-grafik');
-            const teksTombol = document.getElementById('teks-tombol-grafik');
-
-            mainContainer.innerHTML = '';
-
-            // Reset state grafik area
-            chartCard.style.display = "none";
-            wadahGrafik.classList.remove('terbuka');
+    const audioKlik = new Audio('tap_sound.mp3');
+        
+    function putarSuara() {
+        audioKlik.currentTime = 0;
+        audioKlik.play().catch(e => {});
+    }
+ 
+    // 1. STATE GLOBAL & KONFIGURASI
+    let seluruhDataOPD = {};
+    let opdAktif = "";
+    let dataTrenTerhitung = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let globalChartInstance = null;
+ 
+    // 2. INITIALIZATION DATA JSON
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('data-opd.json')
+            .then(response => {
+                if (!response.ok) throw new Error('Gagal memuat file data-opd.json');
+                return response.json();
+            })
+            .then(data => {
+                seluruhDataOPD = data;
+                console.log("Data JSON Berhasil Dimuat:", seluruhDataOPD);
+            })
+            .catch(error => {
+                console.error("Error Fetch Data:", error);
+                alert("Gagal memuat data OPD. Pastikan file 'data-opd.json' berada di folder yang sama.");
+            });
+    });
+ 
+    // 3. DROPDOWN HANDLER
+    function gantiOPD(pilihan) {
+        putarSuara();
+        opdAktif = pilihan;
+        renderDashboard();
+    }
+ 
+    // 4. RENDERING DASHBOARD UTAMA
+    function renderDashboard() {
+        let grandTotalPagu = 0;
+        let grandTotalRealisasi = 0;
+        let totalKegiatanCount = 0;
+ 
+        const mainContainer = document.getElementById('program-list');
+        const chartCard = document.getElementById('global-chart-card');
+        const wadahGrafik = document.getElementById('wadah-grafik-expand');
+        const btnGrafik = document.getElementById('btn-toggle-grafik');
+        const iconTombol = document.getElementById('icon-tombol-grafik');
+        const teksTombol = document.getElementById('teks-tombol-grafik');
+        
+        mainContainer.innerHTML = '';
+        
+        // Reset state grafik area
+        if(chartCard) chartCard.style.display = "none";
+        if(wadahGrafik) wadahGrafik.classList.remove('terbuka');
+        if(btnGrafik) {
             btnGrafik.classList.remove('aktif');
             if (btnGrafik.querySelector('span:last-child')) btnGrafik.querySelector('span:last-child').textContent = '🔽';
-            iconTombol.className = "fa-solid fa-chart-line";
-            teksTombol.textContent = "Lihat Grafik Tren Fisik Bulanan OPD";
-
-            if (globalChartInstance) {
-                globalChartInstance.destroy();
-                globalChartInstance = null;
-            }
-
-            const selector = document.getElementById('opd-selector');
-            const headerLogo = document.getElementById('header-logo-img');
-            const headerTitle = document.getElementById('header-title-text');
-
-            if (opdAktif === "") {
-                headerLogo.src = "assets/logo-infras.png";
-                headerTitle.textContent = "Dashboard Progres Realisasi Fisik & Keuangan 8 OPD Mitra";
-                document.getElementById('total-pagu-label').textContent = "Rp 0";
-                document.getElementById('total-realisasi-label').textContent = "Rp 0";
-                document.getElementById('sisa-pagu-label').textContent = "Rp 0";
-                document.getElementById('total-program-badge').textContent = "0 Program";
-                document.getElementById('total-kegiatan-badge').textContent = "0 Kegiatan";
-                document.getElementById('nama-opd-title').textContent = "Rincian Progres per Program: Silahkan pilih OPD terlebih dahulu";
-                mainContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">Belum ada OPD yang dipilih. Silakan pilih OPD pada menu di atas.</div>';
-                return;
-            }
-
-            const namaOPDTerpilih = selector.options[selector.selectedIndex].text;
-            headerTitle.textContent = `Dashboard Progres Realisasi Fisik & Keuangan ${namaOPDTerpilih}`;
-            headerLogo.src = "assets/logo-" + opdAktif + ".png";
-
-            const dataDipilih = seluruhDataOPD[opdAktif] || [];
-
-            if (dataDipilih.length === 0) {
-                document.getElementById('total-pagu-label').textContent = "Rp 0";
-                document.getElementById('total-realisasi-label').textContent = "Rp 0";
-                document.getElementById('sisa-pagu-label').textContent = "Rp 0";
-                document.getElementById('total-program-badge').textContent = "0 Program";
-                document.getElementById('total-kegiatan-badge').textContent = "0 Kegiatan";
-                document.getElementById('nama-opd-title').textContent = `Rincian Progres per Program: ${namaOPDTerpilih}`;
-                mainContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">Data rincian program untuk OPD ini belum tersedia.</div>';
-                return;
-            }
-
-            let akumulasiTrenBulanan = Array(12).fill(0);
-            let jumlahProgramDenganTren = 0;
-
-            dataDipilih.forEach((item, index) => {
-                const keuPersen = item.pagu > 0 ? ((item.realisasiTot / item.pagu) * 100).toFixed(2) : 0;
-                const sisa = item.pagu - item.realisasiTot;
-
-                grandTotalPagu += item.pagu;
-                grandTotalRealisasi += item.realisasiTot;
-                totalKegiatanCount += item.subKegiatan.length;
-
-                if (!item.progresBulanan) {
-                    item.progresBulanan = [];
-                    for (let i = 0; i < 12; i++) {
-                        if (i <= 4) {
-                            let step = item.fisikPersen / 5;
-                            item.progresBulanan.push(Number((step * (i + 1)).toFixed(2)));
-                        } else {
-                            item.progresBulanan.push(item.fisikPersen);
-                        }
+        }
+        if(iconTombol) iconTombol.className = "fa-solid fa-chart-line";
+        if(teksTombol) teksTombol.textContent = "Lihat Grafik Tren Fisik Bulanan OPD";
+        
+        if (globalChartInstance) {
+            globalChartInstance.destroy();
+            globalChartInstance = null;
+        }
+ 
+        const selector = document.getElementById('opd-selector');
+        const headerLogo = document.getElementById('header-logo-img');
+        const headerTitle = document.getElementById('header-title-text');
+ 
+        if (opdAktif === "") {
+            if(headerLogo) headerLogo.src = "logo-infras.png";
+            if(headerTitle) headerTitle.textContent = "Dashboard Progres Realisasi Fisik & Keuangan 8 OPD Mitra";
+            document.getElementById('total-pagu-label').textContent = "Rp 0";
+            document.getElementById('total-realisasi-label').textContent = "Rp 0";
+            document.getElementById('sisa-pagu-label').textContent = "Rp 0";
+            document.getElementById('total-program-badge').textContent = "0 Program";
+            document.getElementById('total-kegiatan-badge').textContent = "0 Kegiatan";
+            document.getElementById('nama-opd-title').textContent = "Rincian Progres per Program: Silahkan pilih OPD terlebih dahulu";
+            mainContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">Belum ada OPD yang dipilih. Silakan pilih OPD pada menu di atas.</div>';
+            return;
+        }
+ 
+        const namaOPDTerpilih = selector.options[selector.selectedIndex].text;
+        // FIX: Perbaikan tanda petik String Literal pembungkus judul teks
+        headerTitle.textContent = `Dashboard Progres Realisasi Fisik & Keuangan ${namaOPDTerpilih}`;
+        headerLogo.src = "logo-infras.png"; // Atur fallback jika file logo spesifik tidak ada
+ 
+        const dataDipilih = seluruhDataOPD[opdAktif] || [];
+ 
+        if (dataDipilih.length === 0) {
+            document.getElementById('total-pagu-label').textContent = "Rp 0";
+            document.getElementById('total-realisasi-label').textContent = "Rp 0";
+            document.getElementById('sisa-pagu-label').textContent = "Rp 0";
+            document.getElementById('total-program-badge').textContent = "0 Program";
+            document.getElementById('total-kegiatan-badge').textContent = "0 Kegiatan";
+            document.getElementById('nama-opd-title').textContent = `Rincian Progres per Program: ${namaOPDTerpilih}`;
+            mainContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">Data rincian program untuk OPD ini belum tersedia.</div>';
+            return;
+        }
+ 
+        let akumulasiTrenBulanan = Array(12).fill(0);
+        let jumlahProgramDenganTren = 0;
+ 
+        dataDipilih.forEach((item, index) => {
+            const keuPersen = item.pagu > 0 ? ((item.realisasiTot / item.pagu) * 100).toFixed(2) : 0;
+            const sisa = item.pagu - item.realisasiTot;
+ 
+            grandTotalPagu += item.pagu;
+            grandTotalRealisasi += item.realisasiTot;
+            totalKegiatanCount += item.subKegiatan.length;
+ 
+            if (!item.progresBulanan) {
+                item.progresBulanan = [];
+                for (let i = 0; i < 12; i++) {
+                    if (i <= 4) { 
+                        let step = item.fisikPersen / 5;
+                        item.progresBulanan.push(Number((step * (i + 1)).toFixed(2)));
+                    } else { 
+                        item.progresBulanan.push(item.fisikPersen);
                     }
                 }
-
-                if (item.progresBulanan && item.progresBulanan.length === 12) {
-                    for (let i = 0; i < 12; i++) { akumulasiTrenBulanan[i] += item.progresBulanan[i]; }
-                    jumlahProgramDenganTren++;
-                }
-
-                // KONSTRUKSI KARTU UTAMA (LEBAR TOMBOL SUPER RAMPING UNTUK HP)
-                const programCard = document.createElement('div');
-                programCard.className = 'card inner-card';
-
-                programCard.innerHTML = `
+            }
+ 
+            if (item.progresBulanan && item.progresBulanan.length === 12) {
+                for(let i=0; i<12; i++) { akumulasiTrenBulanan[i] += item.progresBulanan[i]; }
+                jumlahProgramDenganTren++;
+            }
+ 
+            // FIX: Template literal dibungkus dengan backtick (`) utuh & penambahan style overflow hidden inline
+            const programCard = document.createElement('div');
+            programCard.className = 'card inner-card';
+            programCard.innerHTML = `
                 <div class="program-header" onclick="putarSuara(); toggleProgram(this, ${index})" style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 12px;">
-                    
                     <div style="flex: 1; min-width: 0; word-break: break-word;">
                         <h3 style="margin: 0; font-size: 14px; line-height: 1.4; color: #1e293b;">${item.namaProgram}</h3>
                         <p style="margin: 4px 0 0 0; font-size: 11px; color: #0c6bdc; font-weight: 700;">Pagu: Rp ${item.pagu.toLocaleString('id-ID')}</p>
                     </div>
-                    
                     <div class="btn-container" onclick="event.stopPropagation();" style="display: flex; flex-direction: column; gap: 5px; align-items: flex-end; flex-shrink: 0; width: 85px;">
                         <button class="toggle-btn" style="width: 100%; padding: 5px 4px; font-size: 11px; font-weight: 600; border-radius: 5px; text-align: center;" onclick="putarSuara(); toggleProgramFromBtn(this, ${index})">Detail</button>
                         <button class="kegiatan-btn" style="display: none; width: 100%; padding: 5px 4px; font-size: 11px; font-weight: 600; border-radius: 5px; text-align: center;" onclick="putarSuara(); toggleKegiatanData(this, ${index})">Kegiatan</button>
                     </div>
                 </div>
-                <div class="program-content" id="keg-${index}">
-                    <div class="card inner-card">
+                <div class="program-content" id="keg-${index}" style="display:none; overflow:hidden; transition: max-height 0.3s ease-out;">
+                    <div class="card inner-card" style="margin-bottom:10px;">
                         <div class="card-flex">
                             <div class="icon-box icon-green"><i class="fa-solid fa-calendar-day"></i></div>
                             <div><h4>Realisasi Bulan Ini (Rp)</h4><h2>Rp ${item.realisasiBulanIni.toLocaleString('id-ID')}</h2></div>
                         </div>
                     </div>
-                    <div class="card inner-card" style="background: #fafafa;">
+                    <div class="card inner-card" style="background: #fafafa; margin-bottom:0; padding:10px;">
                         <div class="wrapper-title">REALISASI TOTAL HINGGA BULAN INI</div>
                         <div class="grid-4">
-                            <div class="card inner-card" style="background: white;"><div class="card-flex"><div class="icon-box icon-green"><i class="fa-solid fa-money-bill"></i></div><div><h4>Total Realisasi</h4><h2>Rp ${item.realisasiTot.toLocaleString('id-ID')}</h2></div></div></div>
-                            <div class="card inner-card" style="background: white;"><div class="card-flex"><div class="icon-box icon-blue"><i class="fa-solid fa-chart-line"></i></div><div><h4>Keuangan (%)</h4><h2>${keuPersen}%</h2></div></div><div class="progress-bar"><div class="progress-fill" style="width: ${keuPersen}%; background:#0c6bdc;"></div></div></div>
-                            <div class="card inner-card" style="background: white;"><div class="card-flex"><div class="icon-box icon-orange"><i class="fa-solid fa-building"></i></div><div><h4>Fisik (%)</h4><h2>${item.fisikPersen}%</h2></div></div><div class="progress-bar"><div class="progress-fill" style="width: ${item.fisikPersen}%; background:#ff9800;"></div></div></div>
-                            <div class="card inner-card" style="background: white;"><div class="card-flex"><div class="icon-box icon-red"><i class="fa-solid fa-hand-holding-dollar"></i></div><div><h4>Sisa Dana</h4><h2>Rp ${sisa.toLocaleString('id-ID')}</h2></div></div></div>
+                            <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-green" style="width:32px; height:32px; font-size:12px;"><i class="fa-solid fa-money-bill"></i></div><div><h4>Total Realisasi</h4><h2 style="font-size:14px;">Rp ${item.realisasiTot.toLocaleString('id-ID')}</h2></div></div></div>
+                            <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-blue" style="width:32px; height:32px; font-size:12px;"><i class="fa-solid fa-chart-line"></i></div><div><h4>Keuangan</h4><h2 style="font-size:14px;">${keuPersen}%</h2></div></div><div class="progress-bar" style="height:6px;"><div class="progress-fill" style="width: ${keuPersen}%; background:#0c6bdc;"></div></div></div>
+                            <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-orange" style="width:32px; height:32px; font-size:12px;"><i class="fa-solid fa-building"></i></div><div><h4>Fisik</h4><h2 style="font-size:14px;">${item.fisikPersen}%</h2></div></div><div class="progress-bar" style="height:6px;"><div class="progress-fill" style="width: ${item.fisikPersen}%; background:#ff9800;"></div></div></div>
+                            <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-red" style="width:32px; height:32px; font-size:12px;"><i class="fa-solid fa-hand-holding-dollar"></i></div><div><h4>Sisa Dana</h4><h2 style="font-size:14px;">Rp ${sisa.toLocaleString('id-ID')}</h2></div></div></div>
                         </div>
                     </div>
                 </div>
-                <div class="sub-kegiatan-wrapper" id="sub-list-${index}">
+                <div class="sub-kegiatan-wrapper" id="sub-list-${index}" style="display:none; overflow:hidden; transition: max-height 0.3s ease-out;">
                     <div class="sub-kegiatan-title"><i class="fa-solid fa-list-check"></i> Daftar Kegiatan Dalam Program</div>
                     <div class="sub-kegiatan-container"></div>
                 </div>
             `;
-                mainContainer.appendChild(programCard);
-
-                const subContainer = programCard.querySelector(`#sub-list-${index} .sub-kegiatan-container`);
+            mainContainer.appendChild(programCard);
+ 
+            // FIX: Pencarian container menggunakan string backtick yang benar
+            const subContainer = programCard.querySelector(`#sub-list-${index} .sub-kegiatan-container`);
+            if(subContainer && item.subKegiatan) {
                 item.subKegiatan.forEach((sub) => {
                     const subKeuPct = sub.pagu > 0 ? ((sub.realisasi / sub.pagu) * 100).toFixed(2) : 0;
                     const subSisa = sub.pagu - sub.realisasi;
                     subContainer.innerHTML += `
-                    <div class="sub-kegiatan-block">
-                        <div class="sub-kegiatan-name-header">
-                            <div class="sub-kegiatan-name-text">
-                                <i class="fa-solid fa-circle-dot" style="color:#28a745; font-size:10px;"></i> <b>${sub.nama}</b>
-                                <div style="font-size:11px; color:#64748b; margin-top:3px;">Pagu: Rp ${sub.pagu.toLocaleString('id-ID')}</div>
+                        <div class="sub-kegiatan-block" style="margin-bottom: 10px;">
+                            <div class="sub-kegiatan-name-header">
+                                <div class="sub-kegiatan-name-text">
+                                    <i class="fa-solid fa-circle-dot" style="color:#28a745; font-size:10px;"></i> <b>${sub.nama}</b>
+                                    <div style="font-size:11px; color:#64748b; margin-top:3px;">Pagu: Rp ${sub.pagu.toLocaleString('id-ID')}</div>
+                                </div>
+                                <button class="sub-detail-btn" onclick="putarSuara(); toggleSubDetailCard(this)">Detail</button>
                             </div>
-                            <button class="sub-detail-btn" onclick="putarSuara(); toggleSubDetailCard(this)">Detail</button>
-                        </div>
-                        <div class="sub-kegiatan-cards-content">
-                            <div class="card inner-card" style="padding:10px; margin-bottom:10px;"><div class="card-flex"><div class="icon-box icon-green" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-calendar-day"></i></div><div><h4>Realisasi Bulan Ini (Rp)</h4><h2 style="font-size:14px; margin-top:2px;">Rp ${sub.realisasiBulanIni.toLocaleString('id-ID')}</h2></div></div></div>
-                            <div class="card inner-card" style="background: #fafafa; padding:12px; margin-bottom:0;">
-                                <div class="wrapper-title" style="font-size:11px; margin-bottom:10px;">REALISASI TOTAL HINGGA BULAN INI</div>
-                                <div class="grid-4">
-                                    <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-green" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-money-bill"></i></div><div><h4 style="font-size:10px;">Total Realisasi</h4><h2 style="font-size:13px;">Rp ${sub.realisasi.toLocaleString('id-ID')}</h2></div></div></div>
-                                    <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-blue" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-chart-line"></i></div><div><h4 style="font-size:10px;">Keuangan (%)</h4><h2 style="font-size:13px;">${subKeuPct}%</h2></div></div><div class="progress-bar" style="height:5px;"><div class="progress-fill" style="width:${subKeuPct}%; background:#0c6bdc;"></div></div></div>
-                                    <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-orange" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-building"></i></div><div><h4 style="font-size:10px;">Fisik (%)</h4><h2 style="font-size:13px;">${sub.fisik}%</h2></div></div><div class="progress-bar" style="height:5px;"><div class="progress-fill" style="width:${sub.fisik}%; background:#ff9800;"></div></div></div>
-                                    <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-red" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-hand-holding-dollar"></i></div><div><h4 style="font-size:10px;">Sisa Dana</h4><h2 style="font-size:13px;">Rp ${subSisa.toLocaleString('id-ID')}</h2></div></div></div>
+                            <div class="sub-kegiatan-cards-content" style="display:none; overflow:hidden;">
+                                <div class="card inner-card" style="padding:10px; margin-bottom:10px;"><div class="card-flex"><div class="icon-box icon-green" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-calendar-day"></i></div><div><h4>Realisasi Bulan Ini (Rp)</h4><h2 style="font-size:14px; margin-top:2px;">Rp ${sub.realisasiBulanIni.toLocaleString('id-ID')}</h2></div></div></div>
+                                <div class="card inner-card" style="background: #fafafa; padding:12px; margin-bottom:0;">
+                                    <div class="wrapper-title" style="font-size:11px; margin-bottom:10px;">REALISASI TOTAL HINGGA BULAN INI</div>
+                                    <div class="grid-4">
+                                        <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-green" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-money-bill"></i></div><div><h4 style="font-size:10px;">Total Realisasi</h4><h2 style="font-size:12px;">Rp ${sub.realisasi.toLocaleString('id-ID')}</h2></div></div></div>
+                                        <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-blue" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-chart-line"></i></div><div><h4 style="font-size:10px;">Keuangan</h4><h2 style="font-size:12px;">${subKeuPct}%</h2></div></div><div class="progress-bar" style="height:5px;"><div class="progress-fill" style="width:${subKeuPct}%; background:#0c6bdc;"></div></div></div>
+                                        <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-orange" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-building"></i></div><div><h4 style="font-size:10px;">Fisik</h4><h2 style="font-size:12px;">${sub.fisik}%</h2></div></div><div class="progress-bar" style="height:5px;"><div class="progress-fill" style="width:${sub.fisik}%; background:#ff9800;"></div></div></div>
+                                        <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-red" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-hand-holding-dollar"></i></div><div><h4 style="font-size:10px;">Sisa Dana</h4><h2 style="font-size:12px;">Rp ${subSisa.toLocaleString('id-ID')}</h2></div></div></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    `;
                 });
-            });
-
-            dataTrenTerhitung = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-            if (jumlahProgramDenganTren > 0) {
-                dataTrenTerhitung = akumulasiTrenBulanan.map(val => Number((val / jumlahProgramDenganTren).toFixed(2)));
             }
-
-            chartCard.style.display = "block";
-
-            document.getElementById('total-pagu-label').textContent = `Rp ${grandTotalPagu.toLocaleString('id-ID')}`;
-            document.getElementById('total-realisasi-label').textContent = `Rp ${grandTotalRealisasi.toLocaleString('id-ID')}`;
-            document.getElementById('sisa-pagu-label').textContent = `Rp ${(grandTotalPagu - grandTotalRealisasi).toLocaleString('id-ID')}`;
-            document.getElementById('total-program-badge').textContent = `${dataDipilih.length} Program`;
-            document.getElementById('total-kegiatan-badge').textContent = `${totalKegiatanCount} Kegiatan`;
-            document.getElementById('nama-opd-title').textContent = `Rincian Progres per Program: ${namaOPDTerpilih}`;
+        });
+ 
+        dataTrenTerhitung = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        if (jumlahProgramDenganTren > 0) {
+            dataTrenTerhitung = akumulasiTrenBulanan.map(val => Number((val / jumlahProgramDenganTren).toFixed(2)));
         }
-
-        // 5. SYNCHRONIZED TOGGLE FUNCTION UNTUK GRAFIK TREN
-        function aksitoggleGrafikGlobal() {
-            putarSuara();
-            const wadahGrafik = document.getElementById('wadah-grafik-expand');
-            const btnGrafik = document.getElementById('btn-toggle-grafik');
-            const iconTombol = document.getElementById('icon-tombol-grafik');
-            const teksTombol = document.getElementById('teks-tombol-grafik');
-
-            wadahGrafik.classList.toggle('terbuka');
-            btnGrafik.classList.toggle('aktif');
-
-            if (wadahGrafik.classList.contains('terbuka')) {
-                if (btnGrafik.querySelector('span:last-child')) btnGrafik.querySelector('span:last-child').textContent = '🔼';
-                iconTombol.className = "fa-solid fa-eye-slash";
-                teksTombol.textContent = "Sembunyikan Grafik Tren Fisik Bulanan OPD";
-                initChart();
-            } else {
-                if (btnGrafik.querySelector('span:last-child')) btnGrafik.querySelector('span:last-child').textContent = '🔽';
-                iconTombol.className = "fa-solid fa-chart-line";
-                teksTombol.textContent = "Lihat Grafik Tren Fisik Bulanan OPD";
-            }
+ 
+        if(chartCard) chartCard.style.display = "block";
+ 
+        document.getElementById('total-pagu-label').textContent = `Rp ${grandTotalPagu.toLocaleString('id-ID')}`;
+        document.getElementById('total-realisasi-label').textContent = `Rp ${grandTotalRealisasi.toLocaleString('id-ID')}`;
+        document.getElementById('sisa-pagu-label').textContent = `Rp ${(grandTotalPagu - grandTotalRealisasi).toLocaleString('id-ID')}`;
+        document.getElementById('total-program-badge').textContent = `${dataDipilih.length} Program`;
+        document.getElementById('total-kegiatan-badge').textContent = `${totalKegiatanCount} Kegiatan`;
+        document.getElementById('nama-opd-title').textContent = `Rincian Progres per Program: ${namaOPDTerpilih}`;
+    }
+ 
+    // 5. SYNCHRONIZED TOGGLE FUNCTION UNTUK GRAFIK TREN
+    function aksitoggleGrafikGlobal() {
+        putarSuara();
+        const wadahGrafik = document.getElementById('wadah-grafik-expand');
+        const btnGrafik = document.getElementById('btn-toggle-grafik');
+        const iconTombol = document.getElementById('icon-tombol-grafik');
+        const teksTombol = document.getElementById('teks-tombol-grafik');
+        
+        if(!wadahGrafik) return;
+        wadahGrafik.classList.toggle('terbuka');
+        if(btnGrafik) btnGrafik.classList.toggle('aktif');
+        
+        if (wadahGrafik.classList.contains('terbuka')) {
+            if (btnGrafik && btnGrafik.querySelector('span:last-child')) btnGrafik.querySelector('span:last-child').textContent = '🔼';
+            if(iconTombol) iconTombol.className = "fa-solid fa-eye-slash";
+            if(teksTombol) teksTombol.textContent = "Sembunyikan Grafik Tren Fisik Bulanan OPD";
+            initChart();
+        } else {
+            if (btnGrafik && btnGrafik.querySelector('span:last-child')) btnGrafik.querySelector('span:last-child').textContent = '🔽';
+            if(iconTombol) iconTombol.className = "fa-solid fa-chart-line";
+            if(teksTombol) teksTombol.textContent = "Lihat Grafik Tren Fisik Bulanan OPD";
         }
-
-        // 6. INITIALIZATION GRAFIK VERTIKAL
-        function initChart() {
-            const ctx = document.getElementById('globalTrendChart').getContext('2d');
-
-            if (globalChartInstance) {
-                globalChartInstance.destroy();
-            }
-
-            const gradientOrange = ctx.createLinearGradient(0, 0, 300, 0);
-            gradientOrange.addColorStop(0, 'rgba(255, 87, 34, 0.4)');
-            gradientOrange.addColorStop(1, 'rgba(255, 87, 34, 0.0)');
-
-            globalChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
-                    datasets: [{
-                        label: 'Progres Fisik Rata-rata (%)',
-                        data: dataTrenTerhitung,
-                        borderColor: '#ff5722',
-                        borderWidth: 3,
-                        backgroundColor: gradientOrange,
-                        fill: true,
-                        tension: 0.3,
-                        pointBackgroundColor: '#ff5722',
-                        pointRadius: 4,
-                        pointHoverRadius: 6
-                    }]
+    }
+ 
+    // 6. INITIALIZATION GRAFIK VERTIKAL
+    function initChart() {
+        const canvas = document.getElementById('globalTrendChart');
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        
+        if (globalChartInstance) {
+            globalChartInstance.destroy();
+        }
+        
+        const gradientOrange = ctx.createLinearGradient(0, 0, 300, 0);
+        gradientOrange.addColorStop(0, 'rgba(255, 87, 34, 0.4)');
+        gradientOrange.addColorStop(1, 'rgba(255, 87, 34, 0.0)');
+        
+        globalChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
+                datasets: [{
+                    label: 'Progres Fisik Rata-rata (%)',
+                    data: dataTrenTerhitung,
+                    borderColor: '#ff5722',
+                    borderWidth: 3,
+                    backgroundColor: gradientOrange,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#ff5722',
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                indexAxis: 'y', 
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
                 },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { callback: function(value) { return value + '%'; } }
                     },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: { callback: function (value) { return value + '%'; } }
-                        },
-                        y: {
-                            reverse: true,
-                            ticks: { color: '#334155', font: { weight: 'bold' } }
-                        }
+                    y: {
+                        reverse: true, 
+                        ticks: { color: '#334155', font: { weight: 'bold' } }
                     }
                 }
-            });
-        }
-
-        // 7. CONTROLLER INTERAKSI - TERINTEGRASI SEMBUNYIKAN PROGRAM JIKA KEGIATAN AKTIF
-        function toggleProgram(header, index) {
-            const content = document.getElementById(`keg-${index}`);
-            const btnDetail = header.querySelector('.toggle-btn');
-            const btnKeg = header.querySelector('.kegiatan-btn');
-            const wrapper = document.getElementById(`sub-list-${index}`);
-
-            header.classList.toggle('active');
-
-            if (header.classList.contains('active')) {
-                if (btnDetail) {
-                    btnDetail.textContent = "Tutup";
-                    btnDetail.style.background = "#ff9800";
-                    btnDetail.style.borderColor = "#e65100";
-                }
-                if (btnKeg) {
-                    btnKeg.style.display = "inline-block";
-                }
-                content.style.display = 'block';
-                content.style.maxHeight = content.scrollHeight + "px";
-                setTimeout(() => {
-                    if (header.classList.contains('active')) content.style.maxHeight = 'none';
-                }, 250);
-            } else {
-                if (btnDetail) {
-                    btnDetail.textContent = "Detail";
-                    btnDetail.style.background = "#0c6bdc";
-                    btnDetail.style.borderColor = "#0a56b2";
-                }
-                if (btnKeg) {
-                    btnKeg.style.display = "none";
-                    btnKeg.classList.remove('aktif');
-                    btnKeg.textContent = "Kegiatan";
-                    btnKeg.style.background = "#28a745";
-                    btnKeg.style.borderColor = "#1e7e34";
-                }
-
-                if (wrapper && wrapper.style.display !== 'none') {
-                    wrapper.style.maxHeight = wrapper.scrollHeight + "px";
-                    setTimeout(() => {
-                        wrapper.style.maxHeight = '0px';
-                        setTimeout(() => { wrapper.style.display = 'none'; }, 200);
-                    }, 10);
-                }
-
-                content.style.maxHeight = content.scrollHeight + "px";
-                setTimeout(() => {
-                    content.style.maxHeight = '0px';
-                    setTimeout(() => { content.style.display = 'none'; }, 200);
-                }, 10);
             }
-        }
-
-        function toggleProgramFromBtn(btn, index) {
-            const header = btn.closest('.program-header');
-            toggleProgram(header, index);
-        }
-
-        function toggleKegiatanData(btn, index) {
-            const wrapper = document.getElementById(`sub-list-${index}`);
-            const content = document.getElementById(`keg-${index}`);
-
-            btn.classList.toggle('aktif');
-
-            if (btn.classList.contains('aktif')) {
-                btn.textContent = "Tutup Kegiatan";
-                btn.style.background = "#00bcd4";
-                btn.style.borderColor = "#0097a7";
-
-                // HILANGKAN INFORMASI PROGRAM (Collapse panel detail program)
-                if (content) {
-                    content.style.maxHeight = content.scrollHeight + "px";
-                    setTimeout(() => {
-                        content.style.maxHeight = '0px';
-                        setTimeout(() => { content.style.display = 'none'; }, 200);
-                    }, 10);
-                }
-
-                // Tampilkan deretan Kegiatan
-                wrapper.style.display = 'block';
-                wrapper.style.maxHeight = wrapper.scrollHeight + "px";
-                setTimeout(() => {
-                    if (btn.classList.contains('aktif')) wrapper.style.maxHeight = 'none';
-                }, 250);
-            } else {
-                btn.textContent = "Kegiatan";
-                btn.style.background = "#28a745";
-                btn.style.borderColor = "#1e7e34";
-
-                // KEMBALIKAN INFORMASI PROGRAM saat Kegiatan ditutup
-                if (content) {
-                    content.style.display = 'block';
-                    content.style.maxHeight = content.scrollHeight + "px";
-                    setTimeout(() => {
-                        content.style.maxHeight = 'none';
-                    }, 250);
-                }
-
-                wrapper.style.maxHeight = wrapper.scrollHeight + "px";
-                setTimeout(() => {
-                    wrapper.style.maxHeight = '0px';
-                    setTimeout(() => { wrapper.style.display = 'none'; }, 200);
-                }, 10);
+        });
+    }
+ 
+    // 7. CONTROLLER INTERAKSI ANIMASI AKORDION BERSIH TANPA OVERLAP
+    function toggleProgram(header, index) {
+        const content = document.getElementById(`keg-${index}`);
+        const btnDetail = header.querySelector('.toggle-btn');
+        const btnKeg = header.querySelector('.kegiatan-btn');
+        const wrapper = document.getElementById(`sub-list-${index}`);
+        
+        header.classList.toggle('active');
+        
+        if (header.classList.contains('active')) {
+            if (btnDetail) {
+                btnDetail.textContent = "Tutup";
+                btnDetail.style.background = "#ff9800"; 
+                btnDetail.style.borderColor = "#e65100";
             }
-        }
-
-        function toggleSubDetailCard(btn) {
-            const block = btn.closest('.sub-kegiatan-block');
-            const content = block.querySelector('.sub-kegiatan-cards-content');
-            btn.classList.toggle('aktif');
-
-            if (btn.classList.contains('aktif')) {
-                btn.textContent = "Tutup";
-                content.style.display = 'block';
-                content.style.maxHeight = content.scrollHeight + "px";
-                setTimeout(() => {
-                    if (btn.classList.contains('aktif')) content.style.maxHeight = 'none';
-                }, 250);
-            } else {
-                btn.textContent = "Detail";
-                content.style.maxHeight = content.scrollHeight + "px";
-                setTimeout(() => {
-                    content.style.maxHeight = '0px';
-                    setTimeout(() => { content.style.display = 'none'; }, 200);
-                }, 10);
+            if (btnKeg) btnKeg.style.display = "inline-block"; 
+            
+            content.style.display = 'block';
+            content.style.maxHeight = content.scrollHeight + "px";
+            
+            setTimeout(() => {
+                if (header.classList.contains('active')) content.style.maxHeight = 'none';
+            }, 300);
+        } else {
+            if (btnDetail) {
+                btnDetail.textContent = "Detail";
+                btnDetail.style.background = "#0c6bdc"; 
+                btnDetail.style.borderColor = "#0a56b2";
             }
+            if (btnKeg) {
+                btnKeg.style.display = "none"; 
+                btnKeg.classList.remove('aktif');
+                btnKeg.textContent = "Kegiatan";
+                btnKeg.style.background = "#28a745";
+                btnKeg.style.borderColor = "#1e7e34";
+            }
+            
+            if (wrapper && wrapper.style.display !== 'none') {
+                wrapper.style.maxHeight = wrapper.offsetHeight + "px";
+                wrapper.offsetHeight; 
+                wrapper.style.maxHeight = '0px';
+                setTimeout(() => { wrapper.style.display = 'none'; }, 300);
+            }
+
+            content.style.maxHeight = content.offsetHeight + "px";
+            content.offsetHeight; 
+            content.style.maxHeight = '0px';
+            setTimeout(() => { content.style.display = 'none'; }, 300);
         }
-    </script>
+    }
+ 
+    function toggleProgramFromBtn(btn, index) {
+        const header = btn.closest('.program-header');
+        if(header) toggleProgram(header, index);
+    }
+ 
+    function toggleKegiatanData(btn, index) {
+    const wrapper = document.getElementById(`sub-list-${index}`);
+    const content = document.getElementById(`keg-${index}`);
+    const header = btn.closest('.program-header');
+    const btnDetail = header ? header.querySelector('.toggle-btn') : null;
+    
+    btn.classList.toggle('aktif');
+    
+    if (btn.classList.contains('aktif')) {
+        btn.textContent = "Tutup Kegiatan";
+        btn.style.background = "#00bcd4"; 
+        btn.style.borderColor = "#0097a7";
+        
+        // Buka langsung meluncur ke bawah (Slide Down)
+        if (content) {
+            content.style.maxHeight = '0px';
+            content.style.display = 'none';
+        }
+        
+        if(wrapper) {
+            wrapper.style.display = 'block';
+            wrapper.style.maxHeight = '0px';
+            
+            wrapper.offsetHeight; // Force repaint awal
+            wrapper.style.maxHeight = wrapper.scrollHeight + "px";
+            
+            setTimeout(() => {
+                if (btn.classList.contains('aktif')) wrapper.style.maxHeight = 'none';
+            }, 250);
+        }
+    } else {
+        // --- AKSI TUTUP: SAMA PERSIS & SESIMPEL TOMBOL SUB-KEGIATAN ---
+        btn.textContent = "Kegiatan";
+        btn.style.background = "#28a745"; 
+        btn.style.borderColor = "#1e7e34";
+        btn.style.display = "none";
+        
+        if (btnDetail) {
+            btnDetail.textContent = "Detail";
+            btnDetail.style.background = "#0c6bdc"; 
+            btnDetail.style.borderColor = "#0a56b2";
+        }
+        
+        if (header) header.classList.remove('active');
+        
+        if(wrapper) {
+            // Kunci tinggi ke ukuran piksel fisik saat ini (Gaya Sub-Kegiatan)
+            wrapper.style.maxHeight = wrapper.offsetHeight + "px";
+            
+            wrapper.offsetHeight; // Force repaint instan agar transisi stabil
+            
+            // Langsung gulung ke 0px tanpa setTimeout bertingkat
+            wrapper.style.maxHeight = '0px';
+            
+            setTimeout(() => { 
+                if (!btn.classList.contains('aktif')) wrapper.style.display = 'none'; 
+            }, 250);
+        }
+        
+        if (content) {
+            content.style.maxHeight = '0px';
+            content.style.display = 'none';
+        }
+    }
+}
+ 
+    function toggleSubDetailCard(btn) {
+    const block = btn.closest('.sub-kegiatan-block');
+    if (!block) return;
+    const content = block.querySelector('.sub-kegiatan-cards-content');
+    if (!content) return;
+    
+    btn.classList.toggle('aktif');
+    
+    if (btn.classList.contains('aktif')) {
+        btn.textContent = "Tutup";
+        btn.style.background = "#ff9800"; 
+        btn.style.borderColor = "#e65100";
+        
+        // --- PROSES BUKA ---
+        content.style.display = 'block';
+        content.style.maxHeight = '0px';
+        content.style.padding = ""; // Kembalikan padding bawaan jika ada
+        content.style.margin = "";  // Kembalikan margin bawaan jika ada
+        
+        content.offsetHeight; // Force repaint
+        content.style.maxHeight = content.scrollHeight + "px";
+        
+        setTimeout(() => {
+            if (btn.classList.contains('aktif')) content.style.maxHeight = 'none';
+        }, 250);
+        
+    } else {
+        // --- PROSES TUTUP ANTI-SENDAT (BERSIH TOTAL) ---
+        btn.textContent = "Detail";
+        btn.style.background = ""; 
+        btn.style.borderColor = "";
+        
+        // Kunci tinggi ke ukuran fisik saat ini
+        content.style.maxHeight = content.offsetHeight + "px";
+        content.offsetHeight; // Force repaint
+        
+        // Amankan penutupan: Nol-kan border, padding, dan margin agar tidak mengganjal gerakan
+        content.style.border = "none"; 
+        content.style.paddingTop = "0px";
+        content.style.paddingBottom = "0px";
+        content.style.marginTop = "0px";
+        content.style.marginBottom = "0px";
+        
+        // Eksekusi gulung penuh ke 0px
+        content.style.maxHeight = '0px';
+        
+        setTimeout(() => { 
+            if (!btn.classList.contains('aktif')) {
+                content.style.display = 'none';
+                // Reset style inline border/padding agar normal saat dibuka kembali nanti
+                content.style.border = "";
+                content.style.padding = "";
+                content.style.margin = "";
+            }
+        }, 250);
+    }
+}
+</script>
 </body>
 
 </html>
