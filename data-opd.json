@@ -1,0 +1,32 @@
+{
+  "bappeda": [
+    {
+      "namaProgram": "PROGRAM PENUNJANG URUSAN PEMERINTAHAN DAERAH PROVINSI",
+      "pagu": 31976763521,
+      "realisasiBulanIni": 2251324595,
+      "realisasiTot": 11609929339,
+      "fisikPersen": 38.44,
+      "progresBulanan": [3.1, 5.8, 12.4, 18.5, 25.0, 32.1, 38.44, 0, 0, 0, 0, 0], 
+      "subKegiatan": [
+        {
+          "nama": "Perencanaan, Penganggaran, dan Evaluasi Kinerja Perangkat Daerah",
+          "pagu": 111127550,
+          "realisasiBulanIni": 0,
+          "realisasi": 0,
+          "fisik": 0
+        }
+      ]
+    }
+  ],
+  "bpbd": [
+    {
+      "namaProgram": "PROGRAM PENUNJANG URUSAN PEMERINTAHAN DAERAH PROVINSI",
+      "pagu": 7488328500,
+      "realisasiBulanIni": 518911652,
+      "realisasiTot": 2790308818,
+      "fisikPersen": 37.25,
+      "progresBulanan": [2.5, 6.0, 11.2, 19.0, 24.5, 30.0, 37.25, 0, 0, 0, 0, 0],
+      "subKegiatan": []
+    }
+  ]
+}
