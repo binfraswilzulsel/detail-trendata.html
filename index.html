@@ -944,7 +944,14 @@
                 content.style.display = 'block';
             } else {
                 if (btnDetail) btnDetail.textContent = "Detail";
-                if (btnKeg) btnKeg.style.display = "none";
+                if (btnKeg) {
+                    btnKeg.style.display = "none";
+                    btnKeg.classList.remove('aktif'); // Reset class aktif
+                    // Reset warna inline agar tidak terkunci oranye saat dibuka kembali nanti
+                    btnKeg.style.backgroundColor = "";
+                    btnKeg.style.borderColor = "";
+                    btnKeg.style.color = "";
+                }
                 content.style.display = 'none';
                 if (wrapper) wrapper.style.display = 'none';
             }
@@ -957,13 +964,27 @@
             const wrapper = document.getElementById(`sub-list-${index}`);
             const content = document.getElementById(`keg-${index}`);
             btn.classList.toggle('aktif');
+            
             if (btn.classList.contains('aktif')) {
                 btn.textContent = "Tutup Kegiatan";
                 if (content) content.style.display = 'none';
                 if (wrapper) wrapper.style.display = 'block';
+                
+                // ===== 🌟 WARNA BARU SAAT TOMBOL JADI "TUTUP KEGIATAN" 🌟 =====
+                btn.style.backgroundColor = "#fa8107";
+                btn.style.borderColor = "#d66e04";
+                btn.style.color = "#ffffff"; // Memastikan teks tetap putih terang
+                // ============================================================
             } else {
                 btn.textContent = "Kegiatan";
                 if (wrapper) wrapper.style.display = 'none';
+                
+                // ===== 🌟 KEMBALIKAN KE WARNA DEFAULT SAAT JADI "KEGIATAN" 🌟 =====
+                // Mengosongkan style inline agar tombol kembali menggunakan warna dari file CSS asli Anda
+                btn.style.backgroundColor = "";
+                btn.style.borderColor = "";
+                btn.style.color = "";
+                // ================================================================
             }
         }
         // 8. FUNGSI TOGGLE DETAIL SUB-KEGIATAN (Daftar Kegiatan)
@@ -980,7 +1001,7 @@
             if (content.style.display === 'none' || content.style.display === '') {
                 content.style.display = 'block';
                 btn.textContent = "Tutup";
-                btn.style.background = "#e53935"; // Mengubah tombol jadi merah saat terbuka (opsional)
+                btn.style.background = "#fa8107"; // Mengubah tombol jadi merah saat terbuka (opsional)
                 btn.style.borderColor = "#b71c1c";
             } else {
                 content.style.display = 'none';
