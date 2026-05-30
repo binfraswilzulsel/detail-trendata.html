@@ -17,7 +17,8 @@
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: #f4f6fb;
+                        background: linear-gradient(180deg, #CFFFE5, #FFDAB9);
+
             color: #333;
             display: flex;
             flex-direction: column;
@@ -62,7 +63,8 @@
 
         /* Card Styles */
         .card {
-            background: white;
+            background: linear-gradient(180deg, #FFFACD, #b7f8fa);
+            
             padding: 15px;
             border-radius: 20px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -304,7 +306,7 @@
         }
 
         /* ✨ TOMBOL PEMICU GRAFIK YANG ATRAKTIF (FISIK & KEUANGAN) ✨ */
-        .btn-grafik-trigger, 
+        .btn-grafik-trigger,
         .btn-grafik-trigger-keu {
             width: 100%;
             padding: 14px;
@@ -351,13 +353,13 @@
         }
 
         /* --- Efek Klik/Senggol Bersama --- */
-        .btn-grafik-trigger:active, 
+        .btn-grafik-trigger:active,
         .btn-grafik-trigger-keu:active {
             transform: translateY(1px);
         }
 
         /* --- Efek Sewaktu Tombol Aktif (Berubah Jadi Merah Guna Menutup) --- */
-        .btn-grafik-trigger.aktif, 
+        .btn-grafik-trigger.aktif,
         .btn-grafik-trigger-keu.aktif {
             background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%) !important;
             color: #ffffff !important;
@@ -373,9 +375,9 @@
             transform: scaleY(0.95);
             transform-origin: top;
             transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                        opacity 0.3s ease,
-                        transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                        margin-top 0.4s ease;
+                opacity 0.3s ease,
+                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                margin-top 0.4s ease;
             background: #ffffff;
         }
 
@@ -383,8 +385,10 @@
             max-height: 340px !important;
             opacity: 1;
             transform: scaleY(1);
-            margin-top: 10px;    /* Diubah dari 20px ke 10px agar lebih rapat dengan tombolnya */
-            margin-bottom: 15px; /* Ditambahkan agar memberikan jarak aman ke tombol bawahnya */
+            margin-top: 10px;
+            /* Diubah dari 20px ke 10px agar lebih rapat dengan tombolnya */
+            margin-bottom: 15px;
+            /* Ditambahkan agar memberikan jarak aman ke tombol bawahnya */
             padding-top: 10px;
             border-top: 1px dashed #cbd5e1;
         }
@@ -520,47 +524,48 @@
         </div>
 
         <!-- CARD GRAFIK TREN (FISIK & KEUANGAN TERPISAH) -->
-<div class="card" id="global-chart-card" style="display: none; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-    <div style="display: flex; flex-direction: column; gap: 0px;">
-        
-        <button class="btn-grafik-trigger" id="btn-toggle-grafik" onclick="putarSuara(); aksitoggleGrafikGlobal('fisik')">
-            <i class="fa-solid fa-chart-line" id="icon-tombol-grafik"></i> 
-            <span id="teks-tombol-grafik">Lihat Grafik Tren Fisik Bulanan OPD</span> 
-            <span>🔽</span>
-        </button>
-        
-        <div class="grafik-expand-content" id="wadah-grafik-expand">
-            <div class="chart-container">
-                <canvas id="globalTrendChart"></canvas>
+        <div class="card" id="global-chart-card" style="display: none; border: 1px solid #e3e6f0;">
+            <div style="display: flex; flex-direction: column; gap: 0px;">
+
+                <button class="btn-grafik-trigger" id="btn-toggle-grafik"
+                    onclick="putarSuara(); aksitoggleGrafikGlobal('fisik')">
+                    <i class="fa-solid fa-chart-line" id="icon-tombol-grafik"></i>
+                    <span id="teks-tombol-grafik">Lihat Grafik Tren Fisik Bulanan OPD</span>
+                    <span>🔽</span>
+                </button>
+
+                <div class="grafik-expand-content" id="wadah-grafik-expand">
+                    <div class="chart-container">
+                        <canvas id="globalTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px;"></div>
+
+                <button class="btn-grafik-trigger-keu" id="btn-toggle-grafik-keu"
+                    onclick="putarSuara(); aksitoggleGrafikGlobal('keuangan')">
+                    <i class="fa-solid fa-money-bill-trend-up" id="icon-tombol-grafik-keu"></i>
+                    <span id="teks-tombol-grafik-keu">Lihat Grafik Tren Keuangan Bulanan OPD</span>
+                    <span>🔽</span>
+                </button>
+
+                <div class="grafik-expand-content" id="wadah-grafik-expand-keuangan">
+                    <div class="chart-container">
+                        <canvas id="globalTrendChartKeuangan"></canvas>
+                    </div>
+                </div>
+
             </div>
         </div>
-
-        <div style="margin-top: 10px;"></div>
-
-        <button class="btn-grafik-trigger-keu" id="btn-toggle-grafik-keu" onclick="putarSuara(); aksitoggleGrafikGlobal('keuangan')">
-            <i class="fa-solid fa-money-bill-trend-up" id="icon-tombol-grafik-keu"></i> 
-            <span id="teks-tombol-grafik-keu">Lihat Grafik Tren Keuangan Bulanan OPD</span> 
-            <span>🔽</span>
-        </button>
-        
-        <div class="grafik-expand-content" id="wadah-grafik-expand-keuangan">
-            <div class="chart-container">
-                <canvas id="globalTrendChartKeuangan"></canvas>
-            </div>
-        </div>
-        
-    </div>
-</div>
-
-        <div class="card" style="border: 1px solid #e2e8f0; border-radius: 12px;">
-            <div class="section-title" id="nama-opd-title" style="color: #475569; font-weight: 700;">Rincian Progres Per Program</div>
+        <div class="card">
+            <div class="section-title" id="nama-opd-title">Rincian Progres Per Program</div>
             <div id="program-list"></div>
         </div>
     </div>
 
-    <div class="footer" style="background-color: #f8fafc; color: #64748b; border-top: 1px solid #e2e8f0; padding: 24px 16px;">
+    <div class="footer">
         Sumber Data: <a href="https://sulselprov.e-planning.id"
-            style="color:#7dd3fc; text-decoration:none; font-weight: 600;">sulselprov.e-planning.id</a> <br>
+            style="color:#6ab0ff; text-decoration:none;">sulselprov.e-planning.id</a> <br>
         &copy; 2026 by @zuwlend. All Rights Reserved.
         <div id="visitorCount" style="margin-top:8px; opacity:0.8;"></div>
     </div>
@@ -573,32 +578,29 @@
             audioKlik.play().catch(e => { });
         }
 
-        // 1. STATE GLOBAL
+        // 1. STATE GLOBAL (Tetap sama)
         let seluruhDataOPD = {};
-        let seluruhDataTrenOPD = {}; 
+        let seluruhDataTrenOPD = {};
         let opdAktif = "";
         let dataTrenFisik = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         let dataTrenKeuangan = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         let chartInstanceFisik = null;
         let chartInstanceKeuangan = null;
 
-        // 2. MEMUAT DATABASE JSON & MENYESUAIKAN BACKGROUND HALAMAN
+        // 2. MEMUAT DATABASE JSON (Tetap sama)
         document.addEventListener("DOMContentLoaded", function () {
-            // 🌟 MENGUBAH BACKGROUND UTAMA HALAMAN MENJADI PASTEL SOFT GRAY/BLUE 🌟
-            document.body.style.backgroundColor = "#f1f5f9"; 
-            
             Promise.all([
                 fetch('data-opd.json').then(res => res.json()),
                 fetch('data-trendOPD.json').then(res => res.json())
             ])
-            .then(([dataOPD, dataTren]) => {
-                seluruhDataOPD = dataOPD;
-                seluruhDataTrenOPD = dataTren;
-                console.log("Database Sukses Dimuat dengan Tema Pastel.");
-            })
-            .catch(err => {
-                console.error("Gagal load JSON:", err);
-            });
+                .then(([dataOPD, dataTren]) => {
+                    seluruhDataOPD = dataOPD;
+                    seluruhDataTrenOPD = dataTren;
+                    console.log("Database Sukses Dimuat.");
+                })
+                .catch(err => {
+                    console.error("Gagal load JSON:", err);
+                });
         });
 
         // 3. DROPDOWN HANDLER
@@ -606,18 +608,19 @@
             putarSuara();
             opdAktif = pilihan;
 
+            // Disesuaikan persis dengan struktur JSON Anda (tren_fisik & tren_keuangan)
             if (opdAktif && seluruhDataTrenOPD[opdAktif]) {
-                dataTrenFisik = seluruhDataTrenOPD[opdAktif].tren_fisik || [0,0,0,0,0,0,0,0,0,0,0,0];
-                dataTrenKeuangan = seluruhDataTrenOPD[opdAktif].tren_keuangan || [0,0,0,0,0,0,0,0,0,0,0,0];
+                dataTrenFisik = seluruhDataTrenOPD[opdAktif].tren_fisik || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                dataTrenKeuangan = seluruhDataTrenOPD[opdAktif].tren_keuangan || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
             } else {
-                dataTrenFisik = [0,0,0,0,0,0,0,0,0,0,0,0];
-                dataTrenKeuangan = [0,0,0,0,0,0,0,0,0,0,0,0];
+                dataTrenFisik = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                dataTrenKeuangan = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
             }
 
             renderDashboard();
         }
 
-        // 4. RENDERING DASHBOARD UTAMA (PASTEL ALTERATION)
+        // 4. RENDERING DASHBOARD UTAMA (Tetap Sesuai Struktur Anda)
         function renderDashboard() {
             let grandTotalPagu = 0;
             let grandTotalRealisasi = 0;
@@ -625,15 +628,15 @@
 
             const mainContainer = document.getElementById('program-list');
             const chartCard = document.getElementById('global-chart-card');
-            
+
             const wadahFisik = document.getElementById('wadah-grafik-expand');
             const btnFisik = document.getElementById('btn-toggle-grafik');
             const iconFisik = document.getElementById('icon-tombol-grafik');
             const teksFisik = document.getElementById('teks-tombol-grafik');
 
             const wadahKeuangan = document.getElementById('wadah-grafik-expand-keuangan');
-            const btnKeuangan = document.getElementById('btn-toggle-grafik-keu');
-            const iconKeuangan = document.getElementById('icon-tombol-grafik-keu');
+            const btnKeuangan = document.getElementById('btn-toggle-grafik-keuangan');
+            const iconKeuangan = document.getElementById('icon-tombol-grafik-keuangan');
             const teksKeuangan = document.getElementById('teks-tombol-grafik-keuangan');
 
             mainContainer.innerHTML = '';
@@ -665,7 +668,7 @@
                 document.getElementById('total-program-badge').textContent = "0 Program";
                 document.getElementById('total-kegiatan-badge').textContent = "0 Kegiatan";
                 document.getElementById('nama-opd-title').textContent = "Rincian Progres per Program: Silahkan pilih OPD terlebih dahulu";
-                mainContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #94a3b8; font-style: italic;">Belum ada OPD yang dipilih. Silakan pilih OPD pada menu di atas.</div>';
+                mainContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">Belum ada OPD yang dipilih. Silakan pilih OPD pada menu di atas.</div>';
                 return;
             }
 
@@ -683,7 +686,7 @@
                 document.getElementById('total-program-badge').textContent = "0 Program";
                 document.getElementById('total-kegiatan-badge').textContent = "0 Kegiatan";
                 document.getElementById('nama-opd-title').textContent = `Rincian Progres per Program: ${namaOPDTerpilih}`;
-                mainContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #94a3b8; font-style: italic;">Data rincian program untuk OPD ini belum tersedia.</div>';
+                mainContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">Data rincian program untuk OPD ini belum tersedia.</div>';
                 return;
             }
 
@@ -697,44 +700,39 @@
 
                 const programCard = document.createElement('div');
                 programCard.className = 'card inner-card';
-                programCard.style.border = "1px solid #e2e8f0";
-                programCard.style.borderRadius = "10px";
-                programCard.style.marginBottom = "12px";
-                programCard.style.backgroundColor = "#ffffff";
-                
                 programCard.innerHTML = `
-                <div class="program-header" onclick="putarSuara(); toggleProgram(this, ${index})" style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 14px; background: #f8fafc; border-radius: 10px 10px 0 0; border-bottom: 1px solid #f1f5f9; cursor: pointer;">
+                <div class="program-header" onclick="putarSuara(); toggleProgram(this, ${index})" style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 12px;">
                     <div style="flex: 1; min-width: 0; word-break: break-word;">
-                        <h3 style="margin: 0; font-size: 14px; line-height: 1.4; color: #334155; font-weight:600;">${item.namaProgram}</h3>
-                        <p style="margin: 4px 0 0 0; font-size: 12px; color: #6366f1; font-weight: 600;">Pagu: Rp ${item.pagu.toLocaleString('id-ID')}</p>
+                        <h3 style="margin: 0; font-size: 14px; line-height: 1.4; color: #1e293b;">${item.namaProgram}</h3>
+                        <p style="margin: 4px 0 0 0; font-size: 11px; color: #0c6bdc; font-weight: 700;">Pagu: Rp ${item.pagu.toLocaleString('id-ID')}</p>
                     </div>
-                    <div class="btn-container" onclick="event.stopPropagation();" style="display: flex; flex-direction: column; gap: 10px; align-items: flex-end; flex-shrink: 0; width: 90px;">
-                        <button class="toggle-btn" style="width: 100%; padding: 6px 4px; font-size: 11px; font-weight: 600; border-radius: 6px; text-align: center; background-color: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; cursor:pointer;" onclick="putarSuara(); toggleProgramFromBtn(this, ${index})">Detail</button>
-                        <button class="kegiatan-btn" style="display: none; width: 100%; padding: 6px 4px; font-size: 11px; font-weight: 600; border-radius: 6px; text-align: center; background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; cursor:pointer;" onclick="putarSuara(); toggleKegiatanData(this, ${index})">Kegiatan</button>
-                    </div>
-                </div>
-                <div class="program-content" id="keg-${index}" style="display:none; padding: 12px; background: #ffffff;">
-                    <div class="card inner-card" style="margin-bottom:12px; border: 1px solid #e2e8f0; background: #fcfdfd;">
-                        <div class="card-flex" style="display:flex; align-items:center; gap:10px;">
-                            <div class="icon-box" style="background:#dcfce7; color:#15803d; padding:8px; border-radius:8px;"><i class="fa-solid fa-calendar-day"></i></div>
-                            <div><h4 style="margin:0; font-size:11px; color:#64748b;">Realisasi Bulan Ini (Rp)</h4><h2 style="margin:2px 0 0 0; font-size:16px; color:#1e293b; font-weight:700;">Rp ${item.realisasiBulanIni.toLocaleString('id-ID')}</h2></div>
-                        </div>
-                    </div>
-                    <div class="card inner-card" style="background: #f8fafc; margin-bottom:0; padding:12px; border: 1px solid #e2e8f0; border-radius:8px;">
-                        <div class="wrapper-title" style="font-size:11px; color:#94a3b8; font-weight:700; letter-spacing:0.5px; margin-bottom:10px;">REALISASI TOTAL HINGGA BULAN INI</div>
-                        <div class="grid-4" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:10px;">
-                            <div class="card inner-card" style="background: white; padding:10px; border:1px solid #e2e8f0;"><div class="card-flex" style="display:flex; align-items:center; gap:8px;"><div class="icon-box" style="width:32px; height:32px; font-size:12px; background:#dcfce7; color:#16a34a; display:flex; align-items:center; justify-content:center; border-radius:6px;"><i class="fa-solid fa-money-bill"></i></div><div><h4 style="margin:0; font-size:10px; color:#64748b;">Total Realisasi</h4><h2 style="font-size:12px; margin:2px 0 0 0; color:#334155;">Rp ${item.realisasiTot.toLocaleString('id-ID')}</h2></div></div></div>
-                            <div class="card inner-card" style="background: white; padding:10px; border:1px solid #e2e8f0;"><div class="card-flex" style="display:flex; align-items:center; gap:8px;"><div class="icon-box" style="width:32px; height:32px; font-size:12px; background:#e0e7ff; color:#4f46e5; display:flex; align-items:center; justify-content:center; border-radius:6px;"><i class="fa-solid fa-chart-line"></i></div><div><h4 style="margin:0; font-size:10px; color:#64748b;">Keuangan</h4><h2 style="font-size:12px; margin:2px 0 0 0; color:#334155;">${keuPersen}%</h2></div></div><div class="progress-bar" style="height:6px; background:#e2e8f0; border-radius:3px; margin-top:6px; overflow:hidden;"><div class="progress-fill" style="width: ${keuPersen}%; background:#818cf8; height:100%;"></div></div></div>
-                            <div class="card inner-card" style="background: white; padding:10px; border:1px solid #e2e8f0;"><div class="card-flex" style="display:flex; align-items:center; gap:8px;"><div class="icon-box" style="width:32px; height:32px; font-size:12px; background:#ccfbf1; color:#0d9488; display:flex; align-items:center; justify-content:center; border-radius:6px;"><i class="fa-solid fa-building"></i></div><div><h4 style="margin:0; font-size:10px; color:#64748b;">Fisik</h4><h2 style="font-size:12px; margin:2px 0 0 0; color:#334155;">${item.fisikPersen}%</h2></div></div><div class="progress-bar" style="height:6px; background:#e2e8f0; border-radius:3px; margin-top:6px; overflow:hidden;"><div class="progress-fill" style="width: ${item.fisikPersen}%; background:#2dd4bf; height:100%;"></div></div></div>
-                            <div class="card inner-card" style="background: white; padding:10px; border:1px solid #e2e8f0;"><div class="card-flex" style="display:flex; align-items:center; gap:8px;"><div class="icon-box" style="width:32px; height:32px; font-size:12px; background:#ffe4e6; color:#e11d48; display:flex; align-items:center; justify-content:center; border-radius:6px;"><i class="fa-solid fa-hand-holding-dollar"></i></div><div><h4 style="margin:0; font-size:10px; color:#64748b;">Sisa Dana</h4><h2 style="font-size:12px; margin:2px 0 0 0; color:#334155;">Rp ${sisa.toLocaleString('id-ID')}</h2></div></div></div>
-                        </div>
+                    <div class="btn-container" onclick="event.stopPropagation();" style="display: flex; flex-direction: column; gap: 15px; align-items: flex-end; flex-shrink: 0; width: 85px;">
+                        <button class="toggle-btn" style="width: 100%; padding: 5px 4px; font-size: 11px; font-weight: 600; border-radius: 5px; text-align: center;" onclick="putarSuara(); toggleProgramFromBtn(this, ${index})">Detail</button>
+                        <button class="kegiatan-btn" style="display: none; width: 100%; padding: 5px 4px; font-size: 11px; font-weight: 600; border-radius: 5px; text-align: center;" onclick="putarSuara(); toggleKegiatanData(this, ${index})">Kegiatan</button>
                     </div>
                 </div>
-                <div class="sub-kegiatan-wrapper" id="sub-list-${index}" style="display:none; padding:12px; background:#f8fafc; border-bottom-left-radius:10px; border-bottom-right-radius:10px;">
-                    <div class="sub-kegiatan-title" style="font-size:12px; color:#475569; font-weight:700; margin-bottom:10px;"><i class="fa-solid fa-list-check" style="color:#6366f1;"></i> Daftar Kegiatan Dalam Program</div>
+                <div class="program-content" id="keg-${index}" style="display:none; overflow:hidden; transition: max-height 0.3s ease-out;">
+                    <div class="card inner-card" style="margin-bottom:10px;">
+                        <div class="card-flex">
+                            <div class="icon-box icon-green"><i class="fa-solid fa-calendar-day"></i></div>
+                            <div><h4>Realisasi Bulan Ini (Rp)</h4><h2>Rp ${item.realisasiBulanIni.toLocaleString('id-ID')}</h2></div>
+                        </div>
+                    </div>
+                    <div class="card inner-card" style="background: #fafafa; margin-bottom:0; padding:10px;">
+                        <div class="wrapper-title">REALISASI TOTAL HINGGA BULAN INI</div>
+                        <div class="grid-4">
+                            <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-green" style="width:32px; height:32px; font-size:12px;"><i class="fa-solid fa-money-bill"></i></div><div><h4>Total Realisasi</h4><h2 style="font-size:14px;">Rp ${item.realisasiTot.toLocaleString('id-ID')}</h2></div></div></div>
+                            <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-blue" style="width:32px; height:32px; font-size:12px;"><i class="fa-solid fa-chart-line"></i></div><div><h4>Keuangan</h4><h2 style="font-size:14px;">${keuPersen}%</h2></div></div><div class="progress-bar" style="height:6px;"><div class="progress-fill" style="width: ${keuPersen}%; background:#0c6bdc;"></div></div></div>
+                            <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-orange" style="width:32px; height:32px; font-size:12px;"><i class="fa-solid fa-building"></i></div><div><h4>Fisik</h4><h2 style="font-size:14px;">${item.fisikPersen}%</h2></div></div><div class="progress-bar" style="height:6px;"><div class="progress-fill" style="width: ${item.fisikPersen}%; background:#ff9800;"></div></div></div>
+                            <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-red" style="width:32px; height:32px; font-size:12px;"><i class="fa-solid fa-hand-holding-dollar"></i></div><div><h4>Sisa Dana</h4><h2 style="font-size:14px;">Rp ${sisa.toLocaleString('id-ID')}</h2></div></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sub-kegiatan-wrapper" id="sub-list-${index}" style="display:none; overflow:hidden; transition: max-height 0.3s ease-out;">
+                    <div class="sub-kegiatan-title"><i class="fa-solid fa-list-check"></i> Daftar Kegiatan Dalam Program</div>
                     <div class="sub-kegiatan-container"></div>
                 </div>
-                `;
+            `;
                 mainContainer.appendChild(programCard);
 
                 const subContainer = programCard.querySelector(`#sub-list-${index} .sub-kegiatan-container`);
@@ -742,37 +740,29 @@
                     item.subKegiatan.forEach((sub) => {
                         const subKeuPct = sub.pagu > 0 ? ((sub.realisasi / sub.pagu) * 100).toFixed(2) : 0;
                         const subSisa = sub.pagu - sub.realisasi;
-                        
-                        const subBlock = document.createElement('div');
-                        subBlock.className = 'sub-kegiatan-block';
-                        subBlock.style.background = '#ffffff';
-                        subBlock.style.border = '1px solid #e2e8f0';
-                        subBlock.style.borderRadius = '8px';
-                        subBlock.style.padding = '10px';
-                        subBlock.style.marginBottom = '10px';
-                        
-                        subBlock.innerHTML = `
-                            <div class="sub-kegiatan-name-header" style="display:flex; justify-content:between; align-items:center; gap:10px;">
-                                <div class="sub-kegiatan-name-text" style="flex:1;">
-                                    <i class="fa-solid fa-circle-dot" style="color:#34d399; font-size:10px;"></i> <b style="color:#334155; font-size:13px;">${sub.nama}</b>
-                                    <div style="font-size:11px; color:#64748b; margin-top:3px; font-weight:600;">Pagu: Rp ${sub.pagu.toLocaleString('id-ID')}</div>
+                        subContainer.innerHTML += `
+                        <div class="sub-kegiatan-block" style="margin-bottom: 10px;">
+                            <div class="sub-kegiatan-name-header">
+                                <div class="sub-kegiatan-name-text">
+                                    <i class="fa-solid fa-circle-dot" style="color:#28a745; font-size:10px;"></i> <b>${sub.nama}</b>
+                                    <div style="font-size:11px; color:#64748b; margin-top:3px;">Pagu: Rp ${sub.pagu.toLocaleString('id-ID')}</div>
                                 </div>
-                                <button class="sub-detail-btn" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; padding:4px 8px; font-size:11px; font-weight:600; border-radius:4px; cursor:pointer;" onclick="putarSuara(); toggleSubDetailCard(this)">Detail</button>
+                                <button class="sub-detail-btn" onclick="putarSuara(); toggleSubDetailCard(this)">Detail</button>
                             </div>
-                            <div class="sub-kegiatan-cards-content" style="display:none; margin-top:10px;">
-                                <div class="card inner-card" style="padding:10px; margin-bottom:10px; border:1px solid #e2e8f0; background:#f8fafc;"><div class="card-flex" style="display:flex; align-items:center; gap:8px;"><div class="icon-box" style="width:30px; height:30px; font-size:12px; background:#dcfce7; color:#16a34a; display:flex; align-items:center; justify-content:center; border-radius:6px;"><i class="fa-solid fa-calendar-day"></i></div><div><h4 style="margin:0; font-size:10px; color:#64748b;">Realisasi Bulan Ini (Rp)</h4><h2 style="font-size:13px; margin:2px 0 0 0; color:#334155;">Rp ${sub.realisasiBulanIni.toLocaleString('id-ID')}</h2></div></div></div>
-                                <div class="card inner-card" style="background: #ffffff; padding:10px; border:1px solid #e2e8f0;">
-                                    <div class="wrapper-title" style="font-size:10px; color:#94a3b8; font-weight:700; margin-bottom:8px;">REALISASI TOTAL HINGGA BULAN INI</div>
-                                    <div class="grid-4" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:8px;">
-                                        <div class="card inner-card" style="background: #fafafa; padding:8px; border:1px solid #f1f5f9;"><div class="card-flex" style="display:flex; align-items:center; gap:6px;"><div class="icon-box" style="width:26px; height:26px; font-size:10px; background:#dcfce7; color:#16a34a; display:flex; align-items:center; justify-content:center; border-radius:4px;"><i class="fa-solid fa-money-bill"></i></div><div><h4 style="margin:0; font-size:9px; color:#64748b;">Total Realisasi</h4><h2 style="font-size:11px; margin:0; color:#334155;">Rp ${sub.realisasi.toLocaleString('id-ID')}</h2></div></div></div>
-                                        <div class="card inner-card" style="background: #fafafa; padding:8px; border:1px solid #f1f5f9;"><div class="card-flex" style="display:flex; align-items:center; gap:6px;"><div class="icon-box" style="width:26px; height:26px; font-size:10px; background:#e0e7ff; color:#4f46e5; display:flex; align-items:center; justify-content:center; border-radius:4px;"><i class="fa-solid fa-chart-line"></i></div><div><h4 style="margin:0; font-size:9px; color:#64748b;">Keuangan</h4><h2 style="font-size:11px; margin:0; color:#334155;">${subKeuPct}%</h2></div></div><div class="progress-bar" style="height:4px; background:#e2e8f0; border-radius:2px; margin-top:4px; overflow:hidden;"><div class="progress-fill" style="width:${subKeuPct}%; background:#818cf8; height:100%;"></div></div></div>
-                                        <div class="card inner-card" style="background: #fafafa; padding:8px; border:1px solid #f1f5f9;"><div class="card-flex" style="display:flex; align-items:center; gap:6px;"><div class="icon-box" style="width:26px; height:26px; font-size:10px; background:#ccfbf1; color:#0d9488; display:flex; align-items:center; justify-content:center; border-radius:4px;"><i class="fa-solid fa-building"></i></div><div><h4 style="margin:0; font-size:9px; color:#64748b;">Fisik</h4><h2 style="font-size:11px; margin:0; color:#334155;">${sub.fisik}%</h2></div></div><div class="progress-bar" style="height:4px; background:#e2e8f0; border-radius:2px; margin-top:4px; overflow:hidden;"><div class="progress-fill" style="width:${sub.fisik}%; background:#2dd4bf; height:100%;"></div></div></div>
-                                        <div class="card inner-card" style="background: #fafafa; padding:8px; border:1px solid #f1f5f9;"><div class="card-flex" style="display:flex; align-items:center; gap:6px;"><div class="icon-box" style="width:26px; height:26px; font-size:10px; background:#ffe4e6; color:#e11d48; display:flex; align-items:center; justify-content:center; border-radius:4px;"><i class="fa-solid fa-hand-holding-dollar"></i></div><div><h4 style="margin:0; font-size:9px; color:#64748b;">Sisa Dana</h4><h2 style="font-size:11px; margin:0; color:#334155;">Rp ${subSisa.toLocaleString('id-ID')}</h2></div></div></div>
+                            <div class="sub-kegiatan-cards-content" style="display:none; overflow:hidden;">
+                                <div class="card inner-card" style="padding:10px; margin-bottom:10px;"><div class="card-flex"><div class="icon-box icon-green" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-calendar-day"></i></div><div><h4>Realisasi Bulan Ini (Rp)</h4><h2 style="font-size:14px; margin-top:2px;">Rp ${sub.realisasiBulanIni.toLocaleString('id-ID')}</h2></div></div></div>
+                                <div class="card inner-card" style="background: #fafafa; padding:12px; margin-bottom:0;">
+                                    <div class="wrapper-title" style="font-size:11px; margin-bottom:10px;">REALISASI TOTAL HINGGA BULAN INI</div>
+                                    <div class="grid-4">
+                                        <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-green" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-money-bill"></i></div><div><h4 style="font-size:10px;">Total Realisasi</h4><h2 style="font-size:12px;">Rp ${sub.realisasi.toLocaleString('id-ID')}</h2></div></div></div>
+                                        <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-blue" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-chart-line"></i></div><div><h4 style="font-size:10px;">Keuangan</h4><h2 style="font-size:12px;">${subKeuPct}%</h2></div></div><div class="progress-bar" style="height:5px;"><div class="progress-fill" style="width:${subKeuPct}%; background:#0c6bdc;"></div></div></div>
+                                        <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-orange" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-building"></i></div><div><h4 style="font-size:10px;">Fisik</h4><h2 style="font-size:12px;">${sub.fisik}%</h2></div></div><div class="progress-bar" style="height:5px;"><div class="progress-fill" style="width:${sub.fisik}%; background:#ff9800;"></div></div></div>
+                                        <div class="card inner-card" style="background: white; padding:10px;"><div class="card-flex"><div class="icon-box icon-red" style="width:30px; height:30px; font-size:12px;"><i class="fa-solid fa-hand-holding-dollar"></i></div><div><h4 style="font-size:10px;">Sisa Dana</h4><h2 style="font-size:12px;">Rp ${subSisa.toLocaleString('id-ID')}</h2></div></div></div>
                                     </div>
                                 </div>
                             </div>
-                        `;
-                        subContainer.appendChild(subBlock);
+                        </div>
+                    `;
                     });
                 }
             });
@@ -787,14 +777,15 @@
             document.getElementById('nama-opd-title').textContent = `Rincian Progres per Program: ${namaOPDTerpilih}`;
         }
 
-        // 5. SYNCHRONIZED TOGGLE FUNCTION
+        // 5. SYNCHRONIZED TOGGLE FUNCTION (Sinkronisasi ID HTML dengan Sempurna)
         function aksitoggleGrafikGlobal(jenis) {
             const wadahFisik = document.getElementById('wadah-grafik-expand');
             const btnFisik = document.getElementById('btn-toggle-grafik');
-            
-            const wadahKeuangan = document.getElementById('wadah-grafik-expand-keuangan');
-            const btnKeuangan = document.getElementById('btn-toggle-grafik-keu');
 
+            const wadahKeuangan = document.getElementById('wadah-grafik-expand-keuangan');
+            const btnKeuangan = document.getElementById('btn-toggle-grafik-keu'); // Disamakan jadi -keu
+
+            // --- 1. JIKA TOMBOL FISIK DIKLIK ---
             if (jenis === 'fisik') {
                 if (btnKeuangan) btnKeuangan.classList.remove('aktif');
                 if (wadahKeuangan) {
@@ -821,6 +812,7 @@
                 }
             }
 
+            // --- 2. JIKA TOMBOL KEUANGAN DIKLIK ---
             if (jenis === 'keuangan') {
                 if (btnFisik) btnFisik.classList.remove('aktif');
                 if (wadahFisik) {
@@ -848,51 +840,50 @@
             }
         }
 
-        // 6. INITIALIZATION GRAFIK (PASTEL COLORS FOR CHART)
+        // 6. INITIALIZATION GRAFIK (Sudah Membaca Variabel State Global yang Benar)
         function initChartFisik() {
             const canvas = document.getElementById('globalTrendChart');
-            if(!canvas) return;
+            if (!canvas) return;
             const ctx = canvas.getContext('2d');
-            
+
             if (chartInstanceFisik) chartInstanceFisik.destroy();
-            
-            const gradientTeal = ctx.createLinearGradient(0, 0, 400, 0);
-            gradientTeal.addColorStop(0, 'rgba(45, 212, 191, 0.25)'); 
-            gradientTeal.addColorStop(1, 'rgba(45, 212, 191, 0.01)');
-            
+
+            const gradientGreen = ctx.createLinearGradient(0, 0, 300, 0);
+            gradientGreen.addColorStop(0, 'rgba(40, 167, 69, 0.2)');
+            gradientGreen.addColorStop(1, 'rgba(40, 167, 69, 0.0)');
+
             chartInstanceFisik = new Chart(ctx, {
                 type: 'line',
-                plugins: [ChartDataLabels], 
+                plugins: [ChartDataLabels],
                 data: {
                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
                     datasets: [{
                         label: 'Progres Fisik (%)',
-                        data: dataTrenFisik, 
-                        borderColor: '#2dd4bf', 
+                        data: dataTrenFisik, // Diperbaiki ke nama variabel global Anda
+                        borderColor: '#28a745',
                         borderWidth: 3,
-                        backgroundColor: gradientTeal,
+                        backgroundColor: gradientGreen,
                         fill: true,
                         tension: 0.3,
-                        pointBackgroundColor: '#2dd4bf',
-                        pointHoverBackgroundColor: '#0cc2aa',
-                        pointRadius: 4
+                        pointBackgroundColor: '#28a745',
+                        pointRadius: 3
                     }]
                 },
                 options: {
-                    indexAxis: 'y', 
+                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
                         datalabels: {
                             display: (context) => context.dataset.data[context.dataIndex] > 0,
-                            align: 'right', offset: 4, color: '#475569', font: { weight: 'bold', size: 10 },
+                            align: 'right', offset: 4, color: '#334155', font: { weight: 'bold', size: 10 },
                             formatter: (value) => value + '%'
                         }
                     },
                     scales: {
-                        x: { beginAtZero: true, max: 110, grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', callback: (v) => v <= 100 ? v + '%' : '' } },
-                        y: { reverse: true, grid: { display: false }, ticks: { color: '#475569', font: { weight: 'bold' } } }
+                        x: { beginAtZero: true, max: 110, ticks: { callback: (v) => v <= 100 ? v + '%' : '' } },
+                        y: { reverse: true, ticks: { color: '#334155', font: { weight: 'bold' } } }
                     }
                 }
             });
@@ -900,54 +891,53 @@
 
         function initChartKeuangan() {
             const canvas = document.getElementById('globalTrendChartKeuangan');
-            if(!canvas) return;
+            if (!canvas) return;
             const ctx = canvas.getContext('2d');
-            
+
             if (chartInstanceKeuangan) chartInstanceKeuangan.destroy();
-            
-            const gradientIndigo = ctx.createLinearGradient(0, 0, 400, 0);
-            gradientIndigo.addColorStop(0, 'rgba(129, 140, 248, 0.25)'); 
-            gradientIndigo.addColorStop(1, 'rgba(129, 140, 248, 0.01)');
-            
+
+            const gradientBlue = ctx.createLinearGradient(0, 0, 300, 0);
+            gradientBlue.addColorStop(0, 'rgba(12, 107, 220, 0.2)');
+            gradientBlue.addColorStop(1, 'rgba(12, 107, 220, 0.0)');
+
             chartInstanceKeuangan = new Chart(ctx, {
                 type: 'line',
-                plugins: [ChartDataLabels], 
+                plugins: [ChartDataLabels],
                 data: {
                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
                     datasets: [{
                         label: 'Progres Keuangan (%)',
-                        data: dataTrenKeuangan, 
-                        borderColor: '#818cf8', 
+                        data: dataTrenKeuangan, // Diperbaiki ke nama variabel global Anda
+                        borderColor: '#0c6bdc',
                         borderWidth: 3,
-                        backgroundColor: gradientIndigo,
+                        backgroundColor: gradientBlue,
                         fill: true,
                         tension: 0.3,
-                        pointBackgroundColor: '#818cf8',
-                        pointHoverBackgroundColor: '#6366f1',
-                        pointRadius: 4
+                        pointBackgroundColor: '#0c6bdc',
+                        pointRadius: 3
                     }]
                 },
                 options: {
-                    indexAxis: 'y', 
+                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
                         datalabels: {
                             display: (context) => context.dataset.data[context.dataIndex] > 0,
-                            align: 'right', offset: 4, color: '#475569', font: { weight: 'bold', size: 10 },
+                            align: 'right', offset: 4, color: '#334155', font: { weight: 'bold', size: 10 },
                             formatter: (value) => value + '%'
                         }
                     },
                     scales: {
-                        x: { beginAtZero: true, max: 110, grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', callback: (v) => v <= 100 ? v + '%' : '' } },
-                        y: { reverse: true, grid: { display: false }, ticks: { color: '#475569', font: { weight: 'bold' } } }
+                        x: { beginAtZero: true, max: 110, ticks: { callback: (v) => v <= 100 ? v + '%' : '' } },
+                        y: { reverse: true, ticks: { color: '#334155', font: { weight: 'bold' } } }
                     }
                 }
             });
         }
 
-        // 7. ANIMASI AKORDION ORIGINAL
+        // 7. ANIMASI AKORDION ORIGINAL ANDA (Tetap sama)
         function toggleProgram(header, index) {
             const content = document.getElementById(`keg-${index}`);
             const btnDetail = header.querySelector('.toggle-btn');
@@ -955,82 +945,75 @@
             const wrapper = document.getElementById(`sub-list-${index}`);
             header.classList.toggle('active');
             if (header.classList.contains('active')) {
-                if (btnDetail) {
-                    btnDetail.textContent = "Tutup";
-                    btnDetail.style.background = "#f1f5f9";
-                    btnDetail.style.color = "#ef4444";
-                    btnDetail.style.borderColor = "#fca5a5";
-                }
+                if (btnDetail) btnDetail.textContent = "Tutup";
                 if (btnKeg) btnKeg.style.display = "inline-block";
                 content.style.display = 'block';
             } else {
-                if (btnDetail) {
-                    btnDetail.textContent = "Detail";
-                    btnDetail.style.background = "#e2e8f0";
-                    btnDetail.style.color = "#475569";
-                    btnDetail.style.borderColor = "#cbd5e1";
-                }
+                if (btnDetail) btnDetail.textContent = "Detail";
                 if (btnKeg) {
                     btnKeg.style.display = "none";
-                    btnKeg.classList.remove('aktif');
+                    btnKeg.classList.remove('aktif'); // Reset class aktif
+                    // Reset warna inline agar tidak terkunci oranye saat dibuka kembali nanti
                     btnKeg.style.backgroundColor = "";
                     btnKeg.style.borderColor = "";
                     btnKeg.style.color = "";
-                    btnKeg.textContent = "Kegiatan";
                 }
                 content.style.display = 'none';
                 if (wrapper) wrapper.style.display = 'none';
             }
         }
-        
         function toggleProgramFromBtn(btn, index) {
             const header = btn.closest('.program-header');
             if (header) toggleProgram(header, index);
         }
-        
         function toggleKegiatanData(btn, index) {
             const wrapper = document.getElementById(`sub-list-${index}`);
             const content = document.getElementById(`keg-${index}`);
             btn.classList.toggle('aktif');
-            
+
             if (btn.classList.contains('aktif')) {
                 btn.textContent = "Tutup Kegiatan";
                 if (content) content.style.display = 'none';
                 if (wrapper) wrapper.style.display = 'block';
-                
-                btn.style.backgroundColor = "#ffedd5";
-                btn.style.borderColor = "#fed7aa";
-                btn.style.color = "#ea580c"; 
+
+                // ===== 🌟 WARNA BARU SAAT TOMBOL JADI "TUTUP KEGIATAN" 🌟 =====
+                btn.style.backgroundColor = "#fa8107";
+                btn.style.borderColor = "#d66e04";
+                btn.style.color = "#ffffff"; // Memastikan teks tetap putih terang
+                // ============================================================
             } else {
                 btn.textContent = "Kegiatan";
                 if (wrapper) wrapper.style.display = 'none';
-                
+
+                // ===== 🌟 KEMBALIKAN KE WARNA DEFAULT SAAT JADI "KEGIATAN" 🌟 =====
+                // Mengosongkan style inline agar tombol kembali menggunakan warna dari file CSS asli Anda
                 btn.style.backgroundColor = "";
                 btn.style.borderColor = "";
                 btn.style.color = "";
+                // ================================================================
             }
         }
-        
-        // 8. FUNGSI TOGGLE DETAIL SUB-KEGIATAN
+        // 8. FUNGSI TOGGLE DETAIL SUB-KEGIATAN (Daftar Kegiatan)
         function toggleSubDetailCard(btn) {
+            // Mencari block sub-kegiatan terdekat
             const block = btn.closest('.sub-kegiatan-block');
             if (!block) return;
-            
+
+            // Mencari konten detail di dalam block tersebut
             const content = block.querySelector('.sub-kegiatan-cards-content');
             if (!content) return;
 
+            // Jalankan aksi toggle tampil/sembunyi
             if (content.style.display === 'none' || content.style.display === '') {
                 content.style.display = 'block';
                 btn.textContent = "Tutup";
-                btn.style.background = "#ffe4e6"; 
-                btn.style.borderColor = "#fecdd3";
-                btn.style.color = "#e11d48";
+                btn.style.background = "#fa8107"; // Mengubah tombol jadi merah saat terbuka (opsional)
+                btn.style.borderColor = "#b71c1c";
             } else {
                 content.style.display = 'none';
                 btn.textContent = "Detail";
-                btn.style.background = "#f1f5f9"; 
-                btn.style.borderColor = "#cbd5e1";
-                btn.style.color = "#475569";
+                btn.style.background = "#28a745"; // Kembalikan jadi hijau saat ditutup
+                btn.style.borderColor = "#1e7e34";
             }
         }
     </script>
