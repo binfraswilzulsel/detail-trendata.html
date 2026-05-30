@@ -17,8 +17,7 @@
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, sans-serif;
-                        background: linear-gradient(180deg, #CFFFE5, #FFDAB9);
-
+            background: linear-gradient(180deg, #eaf4ff, #f7fbff);
             color: #333;
             display: flex;
             flex-direction: column;
@@ -29,11 +28,11 @@
         .header {
             background: linear-gradient(90deg, #0f3c78, #0c6bdc);
             color: white;
-            padding: 20px 20px;
+            padding: 20px;
             display: flex;
             align-items: center;
             gap: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
         }
 
         .header-logo {
@@ -57,30 +56,51 @@
         }
 
         .container {
-            padding: 15px 15px;
+            padding: 15px;
             flex: 1;
         }
 
-        /* Card Styles */
+        /* =========================================
+           CARD STYLE (SESUAI REQUEST HTML PENDEK)
+        =========================================== */
         .card {
-            background: linear-gradient(180deg, #FFFACD, #b7f8fa);
-            
+            background: linear-gradient(180deg, #ffffff, #eef7ff);
             padding: 15px;
             border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow:
+                0 12px 30px rgba(15, 60, 120, 0.12),
+                0 4px 12px rgba(15, 60, 120, 0.08);
             margin-bottom: 15px;
+            transition: all 0.25s ease;
         }
 
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 18px 40px rgba(15, 60, 120, 0.18),
+                0 8px 18px rgba(15, 60, 120, 0.12);
+        }
+
+        /* =========================================
+           INNER CARD STYLE (SESUAI REQUEST HTML PENDEK)
+        =========================================== */
         .inner-card {
             border: 1.5px solid #e3e6f0;
-            box-shadow: none;
-            transition: border-color 0.2s;
+            box-shadow:
+                0 10px 25px rgba(15, 60, 120, 0.10),
+                0 4px 10px rgba(15, 60, 120, 0.06);
+            transition: all 0.25s ease;
         }
 
         .inner-card:hover {
             border-color: #0c6bdc;
+            transform: translateY(-2px);
+            box-shadow:
+                0 16px 35px rgba(15, 60, 120, 0.18),
+                0 8px 18px rgba(15, 60, 120, 0.12);
         }
 
+        /* TEXT */
         .card h4 {
             margin: 0;
             font-size: 11px;
@@ -114,21 +134,10 @@
             flex-shrink: 0;
         }
 
-        .icon-blue {
-            background: #0c6bdc;
-        }
-
-        .icon-green {
-            background: #28a745;
-        }
-
-        .icon-orange {
-            background: #ff9800;
-        }
-
-        .icon-red {
-            background: #e53935;
-        }
+        .icon-blue { background: #0c6bdc; }
+        .icon-green { background: #28a745; }
+        .icon-orange { background: #ff9800; }
+        .icon-red { background: #e53935; }
 
         /* Container Section Title */
         .section-title {
@@ -201,7 +210,7 @@
 
         .toggle-btn {
             background: #0c6bdc;
-            color: rgb(255, 255, 255);
+            color: white;
             border: 1px solid #0a56b2;
             padding: 6px 14px;
             border-radius: 6px;
@@ -231,7 +240,6 @@
             margin-top: 15px;
             padding-top: 15px;
             border-top: 1px solid #eee;
-            /* --- Tambahkan kode di bawah ini --- */
             overflow: hidden;
             transition: max-height 0.3s ease-out;
         }
@@ -243,7 +251,6 @@
             background: #f8fafc;
             border-radius: 12px;
             border-left: 4px solid #28a745;
-            /* --- Tambahkan kode di bawah ini --- */
             overflow: hidden;
             transition: max-height 0.3s ease-out;
         }
@@ -305,7 +312,7 @@
             border-top: 1px dashed #cbd5e1;
         }
 
-        /* ✨ TOMBOL PEMICU GRAFIK YANG ATRAKTIF (FISIK & KEUANGAN) ✨ */
+        /* GRAFIK TRIGGER BUTTONS */
         .btn-grafik-trigger,
         .btn-grafik-trigger-keu {
             width: 100%;
@@ -322,7 +329,6 @@
             letter-spacing: 0.3px;
         }
 
-        /* --- Pengaturan Khusus Tombol Fisik (Biru) --- */
         .btn-grafik-trigger {
             background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
             color: #0c6bdc;
@@ -337,7 +343,6 @@
             transform: translateY(-2px);
         }
 
-        /* --- Pengaturan Khusus Tombol Keuangan (Hijau) --- */
         .btn-grafik-trigger-keu {
             background: linear-gradient(135deg, #ffffff 0%, #f0fff4 100%);
             color: #28a745;
@@ -352,13 +357,11 @@
             transform: translateY(-2px);
         }
 
-        /* --- Efek Klik/Senggol Bersama --- */
         .btn-grafik-trigger:active,
         .btn-grafik-trigger-keu:active {
             transform: translateY(1px);
         }
 
-        /* --- Efek Sewaktu Tombol Aktif (Berubah Jadi Merah Guna Menutup) --- */
         .btn-grafik-trigger.aktif,
         .btn-grafik-trigger-keu.aktif {
             background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%) !important;
@@ -367,17 +370,13 @@
             box-shadow: 0 6px 15px rgba(229, 57, 53, 0.25) !important;
         }
 
-        /* Konten Panel Animasi Expand */
         .grafik-expand-content {
             max-height: 0;
             overflow: hidden;
             opacity: 0;
             transform: scaleY(0.95);
             transform-origin: top;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.3s ease,
-                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                margin-top 0.4s ease;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), margin-top 0.4s ease;
             background: #ffffff;
         }
 
@@ -386,9 +385,7 @@
             opacity: 1;
             transform: scaleY(1);
             margin-top: 10px;
-            /* Diubah dari 20px ke 10px agar lebih rapat dengan tombolnya */
             margin-bottom: 15px;
-            /* Ditambahkan agar memberikan jarak aman ke tombol bawahnya */
             padding-top: 10px;
             border-top: 1px dashed #cbd5e1;
         }
@@ -450,6 +447,7 @@
 
     <div class="container">
 
+        <!-- SELEKTOR OPD -->
         <div class="card inner-card" style="border-left: 5px solid #0c6bdc; background: #fdfdfd; margin-bottom: 20px;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
                 <i class="fa-solid fa-building-shield" style="color: #0c6bdc; font-size: 18px;"></i>
@@ -469,6 +467,7 @@
             </select>
         </div>
 
+        <!-- KARTU RINGKASAN ANGGARAN UTAMA -->
         <div class="card inner-card">
             <div class="card-flex">
                 <div class="icon-box icon-blue"><i class="fa-solid fa-wallet"></i></div>
@@ -499,14 +498,14 @@
             </div>
         </div>
 
+        <!-- KARTU INDIKATOR PROGRAM & KEGIATAN -->
         <div style="display: flex; gap: 15px; width: 100%; margin-bottom: 15px;">
             <div class="card inner-card" style="flex: 1; margin-bottom: 0; padding: 15px;">
                 <div class="card-flex">
                     <div class="icon-box icon-orange"><i class="fa-solid fa-folder-open"></i></div>
                     <div class="card-text" style="min-width: 0;">
                         <h4>TOTAL PROGRAM</h4>
-                        <h2 id="total-program-badge"
-                            style="margin: 8px 0 0 0; font-size: 16px; color: #1a1a1a; font-weight: 700;">0 Program</h2>
+                        <h2 id="total-program-badge" style="margin: 8px 0 0 0; font-size: 16px; color: #1a1a1a; font-weight: 700;">0 Program</h2>
                     </div>
                 </div>
             </div>
@@ -515,20 +514,18 @@
                     <div class="icon-box icon-blue"><i class="fa-solid fa-list-check"></i></div>
                     <div class="card-text" style="min-width: 0;">
                         <h4>TOTAL KEGIATAN</h4>
-                        <h2 id="total-kegiatan-badge"
-                            style="margin: 8px 0 0 0; font-size: 16px; color: #1a1a1a; font-weight: 700;">0 Kegiatan
-                        </h2>
+                        <h2 id="total-kegiatan-badge" style="margin: 8px 0 0 0; font-size: 16px; color: #1a1a1a; font-weight: 700;">0 Kegiatan</h2>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- CARD GRAFIK TREN (FISIK & KEUANGAN TERPISAH) -->
-        <div class="card" id="global-chart-card" style="display: none; border: 1px solid #e3e6f0;">
+        <!-- CARD GRAFIK TREN (FISIK & KEUANGAN) -->
+        <div class="card" id="global-chart-card" style="display: none;">
             <div style="display: flex; flex-direction: column; gap: 0px;">
 
-                <button class="btn-grafik-trigger" id="btn-toggle-grafik"
-                    onclick="putarSuara(); aksitoggleGrafikGlobal('fisik')">
+                <!-- Tombol Tren Fisik -->
+                <button class="btn-grafik-trigger" id="btn-toggle-grafik" onclick="putarSuara(); aksitoggleGrafikGlobal('fisik')">
                     <i class="fa-solid fa-chart-line" id="icon-tombol-grafik"></i>
                     <span id="teks-tombol-grafik">Lihat Grafik Tren Fisik Bulanan OPD</span>
                     <span>🔽</span>
@@ -542,8 +539,8 @@
 
                 <div style="margin-top: 10px;"></div>
 
-                <button class="btn-grafik-trigger-keu" id="btn-toggle-grafik-keu"
-                    onclick="putarSuara(); aksitoggleGrafikGlobal('keuangan')">
+                <!-- Tombol Tren Keuangan -->
+                <button class="btn-grafik-trigger-keu" id="btn-toggle-grafik-keu" onclick="putarSuara(); aksitoggleGrafikGlobal('keuangan')">
                     <i class="fa-solid fa-money-bill-trend-up" id="icon-tombol-grafik-keu"></i>
                     <span id="teks-tombol-grafik-keu">Lihat Grafik Tren Keuangan Bulanan OPD</span>
                     <span>🔽</span>
@@ -557,19 +554,22 @@
 
             </div>
         </div>
+
+        <!-- DAFTAR RINCIAN PROGRAM -->
         <div class="card">
             <div class="section-title" id="nama-opd-title">Rincian Progres Per Program</div>
             <div id="program-list"></div>
         </div>
     </div>
 
+    <!-- FOOTER -->
     <div class="footer">
-        Sumber Data: <a href="https://sulselprov.e-planning.id"
-            style="color:#6ab0ff; text-decoration:none;">sulselprov.e-planning.id</a> <br>
+        Sumber Data: <a href="https://sulselprov.e-planning.id" style="color:#6ab0ff; text-decoration:none;">sulselprov.e-planning.id</a> <br>
         &copy; 2026 by @zuwlend. All Rights Reserved.
         <div id="visitorCount" style="margin-top:8px; opacity:0.8;"></div>
     </div>
 
+    <!-- LOGIKA JAVASCRIPT -->
     <script>
         const audioKlik = new Audio('tap_sound.mp3');
 
@@ -578,7 +578,7 @@
             audioKlik.play().catch(e => { });
         }
 
-        // 1. STATE GLOBAL (Tetap sama)
+        // 1. STATE GLOBAL
         let seluruhDataOPD = {};
         let seluruhDataTrenOPD = {};
         let opdAktif = "";
@@ -587,20 +587,20 @@
         let chartInstanceFisik = null;
         let chartInstanceKeuangan = null;
 
-        // 2. MEMUAT DATABASE JSON (Tetap sama)
+        // 2. MEMUAT DATABASE JSON
         document.addEventListener("DOMContentLoaded", function () {
             Promise.all([
                 fetch('data-opd.json').then(res => res.json()),
                 fetch('data-trendOPD.json').then(res => res.json())
             ])
-                .then(([dataOPD, dataTren]) => {
-                    seluruhDataOPD = dataOPD;
-                    seluruhDataTrenOPD = dataTren;
-                    console.log("Database Sukses Dimuat.");
-                })
-                .catch(err => {
-                    console.error("Gagal load JSON:", err);
-                });
+            .then(([dataOPD, dataTren]) => {
+                seluruhDataOPD = dataOPD;
+                seluruhDataTrenOPD = dataTren;
+                console.log("Database Sukses Dimuat.");
+            })
+            .catch(err => {
+                console.error("Gagal load JSON:", err);
+            });
         });
 
         // 3. DROPDOWN HANDLER
@@ -608,7 +608,6 @@
             putarSuara();
             opdAktif = pilihan;
 
-            // Disesuaikan persis dengan struktur JSON Anda (tren_fisik & tren_keuangan)
             if (opdAktif && seluruhDataTrenOPD[opdAktif]) {
                 dataTrenFisik = seluruhDataTrenOPD[opdAktif].tren_fisik || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                 dataTrenKeuangan = seluruhDataTrenOPD[opdAktif].tren_keuangan || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -620,7 +619,7 @@
             renderDashboard();
         }
 
-        // 4. RENDERING DASHBOARD UTAMA (Tetap Sesuai Struktur Anda)
+        // 4. RENDERING DASHBOARD UTAMA
         function renderDashboard() {
             let grandTotalPagu = 0;
             let grandTotalRealisasi = 0;
@@ -635,9 +634,9 @@
             const teksFisik = document.getElementById('teks-tombol-grafik');
 
             const wadahKeuangan = document.getElementById('wadah-grafik-expand-keuangan');
-            const btnKeuangan = document.getElementById('btn-toggle-grafik-keuangan');
-            const iconKeuangan = document.getElementById('icon-tombol-grafik-keuangan');
-            const teksKeuangan = document.getElementById('teks-tombol-grafik-keuangan');
+            const btnKeuangan = document.getElementById('btn-toggle-grafik-keu');
+            const iconKeuangan = document.getElementById('icon-tombol-grafik-keu');
+            const teksKeuangan = document.getElementById('teks-tombol-grafik-keu');
 
             mainContainer.innerHTML = '';
 
@@ -696,7 +695,7 @@
 
                 grandTotalPagu += item.pagu;
                 grandTotalRealisasi += item.realisasiTot;
-                totalKegiatanCount += item.subKegiatan.length;
+                totalKegiatanCount += item.subKegiatan ? item.subKegiatan.length : 0;
 
                 const programCard = document.createElement('div');
                 programCard.className = 'card inner-card';
@@ -732,7 +731,7 @@
                     <div class="sub-kegiatan-title"><i class="fa-solid fa-list-check"></i> Daftar Kegiatan Dalam Program</div>
                     <div class="sub-kegiatan-container"></div>
                 </div>
-            `;
+                `;
                 mainContainer.appendChild(programCard);
 
                 const subContainer = programCard.querySelector(`#sub-list-${index} .sub-kegiatan-container`);
@@ -762,7 +761,7 @@
                                 </div>
                             </div>
                         </div>
-                    `;
+                        `;
                     });
                 }
             });
@@ -777,13 +776,13 @@
             document.getElementById('nama-opd-title').textContent = `Rincian Progres per Program: ${namaOPDTerpilih}`;
         }
 
-        // 5. SYNCHRONIZED TOGGLE FUNCTION (Sinkronisasi ID HTML dengan Sempurna)
+        // 5. SYNCHRONIZED TOGGLE FUNCTION
         function aksitoggleGrafikGlobal(jenis) {
             const wadahFisik = document.getElementById('wadah-grafik-expand');
             const btnFisik = document.getElementById('btn-toggle-grafik');
 
             const wadahKeuangan = document.getElementById('wadah-grafik-expand-keuangan');
-            const btnKeuangan = document.getElementById('btn-toggle-grafik-keu'); // Disamakan jadi -keu
+            const btnKeuangan = document.getElementById('btn-toggle-grafik-keu');
 
             // --- 1. JIKA TOMBOL FISIK DIKLIK ---
             if (jenis === 'fisik') {
@@ -840,7 +839,7 @@
             }
         }
 
-        // 6. INITIALIZATION GRAFIK (Sudah Membaca Variabel State Global yang Benar)
+        // 6. INITIALIZATION GRAFIK
         function initChartFisik() {
             const canvas = document.getElementById('globalTrendChart');
             if (!canvas) return;
@@ -859,7 +858,7 @@
                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
                     datasets: [{
                         label: 'Progres Fisik (%)',
-                        data: dataTrenFisik, // Diperbaiki ke nama variabel global Anda
+                        data: dataTrenFisik,
                         borderColor: '#28a745',
                         borderWidth: 3,
                         backgroundColor: gradientGreen,
@@ -907,7 +906,7 @@
                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
                     datasets: [{
                         label: 'Progres Keuangan (%)',
-                        data: dataTrenKeuangan, // Diperbaiki ke nama variabel global Anda
+                        data: dataTrenKeuangan,
                         borderColor: '#0c6bdc',
                         borderWidth: 3,
                         backgroundColor: gradientBlue,
@@ -937,7 +936,7 @@
             });
         }
 
-        // 7. ANIMASI AKORDION ORIGINAL ANDA (Tetap sama)
+        // 7. ANIMASI AKORDION ORIGINAL
         function toggleProgram(header, index) {
             const content = document.getElementById(`keg-${index}`);
             const btnDetail = header.querySelector('.toggle-btn');
@@ -952,8 +951,7 @@
                 if (btnDetail) btnDetail.textContent = "Detail";
                 if (btnKeg) {
                     btnKeg.style.display = "none";
-                    btnKeg.classList.remove('aktif'); // Reset class aktif
-                    // Reset warna inline agar tidak terkunci oranye saat dibuka kembali nanti
+                    btnKeg.classList.remove('aktif');
                     btnKeg.style.backgroundColor = "";
                     btnKeg.style.borderColor = "";
                     btnKeg.style.color = "";
@@ -962,10 +960,12 @@
                 if (wrapper) wrapper.style.display = 'none';
             }
         }
+
         function toggleProgramFromBtn(btn, index) {
             const header = btn.closest('.program-header');
             if (header) toggleProgram(header, index);
         }
+
         function toggleKegiatanData(btn, index) {
             const wrapper = document.getElementById(`sub-list-${index}`);
             const content = document.getElementById(`keg-${index}`);
@@ -976,43 +976,36 @@
                 if (content) content.style.display = 'none';
                 if (wrapper) wrapper.style.display = 'block';
 
-                // ===== 🌟 WARNA BARU SAAT TOMBOL JADI "TUTUP KEGIATAN" 🌟 =====
                 btn.style.backgroundColor = "#fa8107";
                 btn.style.borderColor = "#d66e04";
-                btn.style.color = "#ffffff"; // Memastikan teks tetap putih terang
-                // ============================================================
+                btn.style.color = "#ffffff";
             } else {
                 btn.textContent = "Kegiatan";
                 if (wrapper) wrapper.style.display = 'none';
 
-                // ===== 🌟 KEMBALIKAN KE WARNA DEFAULT SAAT JADI "KEGIATAN" 🌟 =====
-                // Mengosongkan style inline agar tombol kembali menggunakan warna dari file CSS asli Anda
                 btn.style.backgroundColor = "";
                 btn.style.borderColor = "";
                 btn.style.color = "";
-                // ================================================================
             }
         }
-        // 8. FUNGSI TOGGLE DETAIL SUB-KEGIATAN (Daftar Kegiatan)
+
+        // 8. FUNGSI TOGGLE DETAIL SUB-KEGIATAN
         function toggleSubDetailCard(btn) {
-            // Mencari block sub-kegiatan terdekat
             const block = btn.closest('.sub-kegiatan-block');
             if (!block) return;
 
-            // Mencari konten detail di dalam block tersebut
             const content = block.querySelector('.sub-kegiatan-cards-content');
             if (!content) return;
 
-            // Jalankan aksi toggle tampil/sembunyi
             if (content.style.display === 'none' || content.style.display === '') {
                 content.style.display = 'block';
                 btn.textContent = "Tutup";
-                btn.style.background = "#fa8107"; // Mengubah tombol jadi merah saat terbuka (opsional)
+                btn.style.background = "#fa8107";
                 btn.style.borderColor = "#b71c1c";
             } else {
                 content.style.display = 'none';
                 btn.textContent = "Detail";
-                btn.style.background = "#28a745"; // Kembalikan jadi hijau saat ditutup
+                btn.style.background = "#28a745";
                 btn.style.borderColor = "#1e7e34";
             }
         }
